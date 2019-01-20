@@ -33,10 +33,6 @@ int main(int argc,char **argv)
     else
         exit(ERROR);
     printf("要绑定的ip端口为%d\n",4000);
-
-
-
-
     int listen_sock = init_server(n,"0.0.0.0");//初始化
     fd_set rfds, wfds;
 
