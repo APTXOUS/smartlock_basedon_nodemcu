@@ -18,11 +18,11 @@
   </Data>
   <Data name="FrameConfigLine1.Checked">
     <Type>Boolean</Type>
-    <Value>False</Value>
+    <Value>True</Value>
   </Data>
   <Data name="FrameConfigLine1.FilePath">
     <Type>String</Type>
-    <Value>C:\Users\youyaoyin\OneDrive\国创项目\nodemcu-master-9-modules-2018-11-11-06-33-15-integer.bin</Value>
+    <Value>C:\Users\youyaoyin\OneDrive\国创项目\smartlock_basedon_nodemcu\Firmware\nodemcu-master-9-modules-2019-01-21-08-14-42-integer.bin</Value>
   </Data>
   <Data name="FrameConfigLine1.Offset">
     <Type>String</Type>
@@ -34,23 +34,23 @@
   </Data>
   <Data name="FrameConfigLine2.FilePath">
     <Type>String</Type>
-    <Value>C:\Users\youyaoyin\OneDrive\国创项目\nodemcu-master-12-modules-2018-12-14-07-05-55-integer.bin</Value>
+    <Value/>
   </Data>
   <Data name="FrameConfigLine2.Offset">
     <Type>String</Type>
-    <Value>0x00000</Value>
+    <Value/>
   </Data>
   <Data name="FrameConfigLine3.Checked">
     <Type>Boolean</Type>
-    <Value>True</Value>
+    <Value>False</Value>
   </Data>
   <Data name="FrameConfigLine3.FilePath">
     <Type>String</Type>
-    <Value>C:\Users\youyaoyin\OneDrive\国创项目\smartlock_basedon_nodemcu\Firmware\nodemcu-master-8-modules-2019-01-20-03-01-24-integer.bin</Value>
+    <Value/>
   </Data>
   <Data name="FrameConfigLine3.Offset">
     <Type>String</Type>
-    <Value>0x00000</Value>
+    <Value/>
   </Data>
   <Data name="FrameConfigLine4.Checked">
     <Type>Boolean</Type>

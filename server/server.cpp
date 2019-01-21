@@ -52,7 +52,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cstring>
+#include <string.h>
 using namespace std;
 
 #define status int
@@ -70,14 +70,11 @@ int updatebfds(fd_set fds);
 
 int main(int argc, char **argv)
 {
-    int n;
-    if (OK == check_is_integer(argv[1]))
-        n = atoi(argv[1]);
-    else
-        exit(ERROR);
+    int n=4000;
     printf("要绑定的ip端口为%d\n", 4000);
     int listen_sock = init_server(n, "0.0.0.0"); //初始化
-    fd_set rfds, wfds, bfds;;
+    fd_set rfds, wfds, bfds;
+    ;
     fd_set lfds;
     struct sockaddr_in remote;
     socklen_t len = sizeof(struct sockaddr_in);
@@ -90,7 +87,7 @@ int main(int argc, char **argv)
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
     int book[100];
-    memest(book, 0, sizeof(book));
+    memset(book, 0, sizeof(book));
     int sock = 0;
     int flag = 1;
     char buf[Max_BUff];
@@ -137,7 +134,7 @@ int main(int argc, char **argv)
         }
         case 0:
         {
-            break; 
+            break;
         }
         default:
         {
@@ -147,10 +144,10 @@ int main(int argc, char **argv)
             {
                 if (FD_ISSET(i, &bfds))
                 {
-                    int wflag=0;
+                    int wflag = 0;
                     if (FD_ISSET(i, &rfds))
                     {
-                        
+
                         _s = read(i, buf, Max_BUff);
                         if (_s == 0)
                         {
@@ -170,19 +167,18 @@ int main(int argc, char **argv)
                                 close(i);
                                 FD_CLR(i, &bfds);
                                 book[i] = 0;
-                                total[i] = 0;
                                 continue;
                             }
                         }
                         else
                         {
                             buf[_s] = 0;
-                            wflag=1
+                            wflag = 1;
                         }
                     }
-                    if(FD_ISSET(i,&wfds))
+                    if (FD_ISSET(i, &wfds))
                     {
-                        if(wflag)
+                        if (wflag)
                         {
                             _s = write(i, buf, _s);
                             //需要进行错误处理
@@ -190,6 +186,7 @@ int main(int argc, char **argv)
                     }
                 }
             }
+        }
         }
     }
     return 0;

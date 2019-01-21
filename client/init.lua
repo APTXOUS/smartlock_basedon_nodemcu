@@ -1,22 +1,25 @@
 --connect to wifi
 --I think I should use a better way to change the settings
 --the firmware need end user setup module
-print('Setting up WIFI...')
-wifi.setmode(wifi.STATIONAP)
-wifi.ap.config({ssid="NODEMCU", pwd="12345678", auth=wifi.WPA2_PSK})
 
-print("ap ip:"..wifi.ap.getip())
-print("ap mac:"..wifi.ap.getmac())
-print("sta mac:"..wifi.sta.getmac())
+print("loading....")
 
 
-enduser_setup.manual(true)  
-enduser_setup.start(
-  function()
-    print("Connectedto   wifi ip is:" .. wifi.sta.getip())   
-  end,
-  function(err, str)
-    print("enduser_setup: Err #" .. err .. ": " .. str)
-  end
-)
 
+function init() 
+    print("now the client start")
+    
+    l = file.list()
+    for name, size in pairs(l) do 
+        print("name: " ..name..", size: "..size)
+    end
+    
+    if(file.exists("connect_to_wifi.lua")) then
+        dofile("connect_to_wifi.lua")
+    else
+        print("ERROR:lost file")
+    end
+    
+end
+
+tmr.alarm(0, 2000, tmr.ALARM_SINGLE, init)
