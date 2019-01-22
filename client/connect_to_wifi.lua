@@ -15,11 +15,16 @@ else
     conf=dofile("get_conf_from_http.lua")
 end
 
-if(conf ~=nil) then
-    wifi.sta.config(config.wifi)
-    wifi.sta.autoconnect(1)
-else
-    conf=dofile("get_conf_from_http.lua")
-end
 
---print(conf.wifi.sta.ssid)
+
+--if(conf ~=nil) then
+--    wifi.sta.config(config.wifi)
+--    wifi.sta.autoconnect(1)
+--else
+--    conf=dofile("get_conf_from_http.lua")
+--end
+
+
+
+print(conf.wifi.sta.ssid)
+print(conf.wifi.sta.pwd)
