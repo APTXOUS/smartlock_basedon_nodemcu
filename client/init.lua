@@ -18,6 +18,7 @@ function init()
         dofile("connect_to_wifi.lua")
     else
         print("ERROR:lost file")
+        return 
     end
     
     function reconnect_wifi()
