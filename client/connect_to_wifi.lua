@@ -15,16 +15,17 @@ else
     conf=dofile("get_conf_from_http.lua")
 end
 
-if(conf ~=nil) then
-    wifi.sta.config(config.wifi)
-    wifi.sta.autoconnect(1)
-else
-    conf=dofile("get_conf_from_http.lua")
-end
-
-print(conf.wifi.sta.ssid)
-print(conf.wifi.sta.pwd)
+print(conf["station_ssid"])
+print(conf["station_pwd"])
 
 
+station_cfg={}
+station_cfg.ssid=conf["station_ssid"]
+station_cfg.pwd=conf["station_pwd"]
+station_cfg.save=false
 
+wifi.sta.config(station_cfg)
+wifi.sta.connect()
+
+print("now end to connect to wifi")
 

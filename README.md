@@ -31,3 +31,4 @@
 * Wifi
 * end user setup
 * http
+* SJSON

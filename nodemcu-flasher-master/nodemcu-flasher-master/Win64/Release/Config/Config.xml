@@ -18,7 +18,7 @@
   </Data>
   <Data name="FrameConfigLine1.Checked">
     <Type>Boolean</Type>
-    <Value>True</Value>
+    <Value>False</Value>
   </Data>
   <Data name="FrameConfigLine1.FilePath">
     <Type>String</Type>
@@ -30,15 +30,15 @@
   </Data>
   <Data name="FrameConfigLine2.Checked">
     <Type>Boolean</Type>
-    <Value>False</Value>
+    <Value>True</Value>
   </Data>
   <Data name="FrameConfigLine2.FilePath">
     <Type>String</Type>
-    <Value/>
+    <Value>C:\Users\youyaoyin\OneDrive\国创项目\smartlock_basedon_nodemcu\Firmware\nodemcu-master-10-modules-2019-01-28-08-30-18-integer.bin</Value>
   </Data>
   <Data name="FrameConfigLine2.Offset">
     <Type>String</Type>
-    <Value/>
+    <Value>0x00000</Value>
   </Data>
   <Data name="FrameConfigLine3.Checked">
     <Type>Boolean</Type>
