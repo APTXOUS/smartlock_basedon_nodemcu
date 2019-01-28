@@ -21,7 +21,7 @@
        * 访问服务器，交换数据
 	* 无外网访问能力
     	* 局域网模式 	
-###固件依赖
+#固件依赖
 * file
 * GPIO
 * net
@@ -32,3 +32,7 @@
 * end user setup
 * http
 * SJSON
+
+
+#其他依赖   
+NodeMCU-HTTP-Server https://github.com/wangzexi/NodeMCU-HTTP-Server
