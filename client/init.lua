@@ -18,8 +18,25 @@ function init()
         dofile("connect_to_wifi.lua")
     else
         print("ERROR:lost file")
+        return 
     end
     
+    function reconnect_wifi()
+        if wifi.sta.getip() == nil then
+            print('Waiting for IP ...')
+        else
+            print('IP is ' .. wifi.sta.getip())
+            tmr.stop(1) -- 连上了wifi就停止定时器1连接
+        end
+    end
+    
+    tmr.alarm(1, 1000, tmr.ALARM_AUTO, reconnect_wifi) -- 打开定时器1,1000ms重连，自动重连，处理函数
+    
+    if wifi.sta.getip() ~= nil then
+        dofile("main_wan.lua")
+    else
+        dofile("main_lan.lua")
+    end
 end
 
 tmr.alarm(0, 2000, tmr.ALARM_SINGLE, init)
