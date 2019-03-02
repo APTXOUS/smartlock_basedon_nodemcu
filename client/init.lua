@@ -38,3 +38,6 @@ function reconnect_wifi()
 end
 
 tmr.alarm(1, 1000, tmr.ALARM_AUTO, reconnect_wifi) -- 打开定时器1,1000ms重连，自动重连，处理函数
+
+
+
