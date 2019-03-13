@@ -15,5 +15,13 @@ conf["station_pwd"]=data["pwd"]
 
 print("end to get conf from file")
 
+ledtable = {}
+ledtable.ledR=100
+ledtable.ledB=50
+ledtable.ledG=160
+
+obj = sjson.encoder(ledtable)
+print(obj:read())
+
 
 return conf
