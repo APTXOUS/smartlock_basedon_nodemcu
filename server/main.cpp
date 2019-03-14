@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <string.h>
 
 const int BUFF_LEN = 200;
 
@@ -38,7 +39,7 @@ int main()
             return 0;
         }
         printf("server recv: %s\n", buf);
-        printf("recv from: %s:%d",inet_ntoa(cli.sin_addr).cli.sin_port);
+        printf("recv from: %s:%d",inet_ntoa(cli.sin_addr),cli.sin_port);
         memset(buf, 0, BUFF_LEN);
         sprintf(buf, "I have recieved %d bytes data!\n", count);           //回复client
         printf("server send: %s\n", buf);                                        //打印自己发送的信息给
