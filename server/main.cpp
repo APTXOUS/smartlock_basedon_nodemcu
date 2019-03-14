@@ -20,13 +20,24 @@ struct package{
     char Info[100]; //属性
 };
 
+struct machine{
+    char Id[16];  
+    struct sockaddr_in addr_info;
+    int status;
+    char buf[500];
+};  
 
-void save_machince_info()
+void save_machince_info(struct package info)
 {
 
 }
 
 void save_status()
+{
+
+}
+
+void do_package_command(struct package info)
 {
 
 }
@@ -59,13 +70,15 @@ int main()
     //  若设备id已经被保存，更新设备连接时间
     
     
-    
+    //我感觉阻塞没有问题（有可能以后会改叭）
+
     struct sockaddr_in cli;
     socklen_t len = sizeof(cli);
     int count;
     char buf[BUFF_LEN];
     while (1)
     {
+        struct package temp;
         count = recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr *)&cli, &len);
         if (count == -1)
         {
@@ -74,7 +87,11 @@ int main()
         }
         printf("server recv: %s\n", buf);
         printf("recv from: %s:%d\n",inet_ntoa(cli.sin_addr),cli.sin_port);
-        memset(buf, 0, BUFF_LEN);
+        memcpy((char *)&temp,buf,count);
+        save_machince_info(temp);
+        do_package_command(temp);
+        
+
         sprintf(buf, "I have recieved %d bytes data!\n", count);                //回复client
         printf("server send: %s\n", buf);                                       //打印自己发送的信息给
         sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr *)&cli, len);
