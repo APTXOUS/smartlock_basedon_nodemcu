@@ -203,6 +203,8 @@ void NodeMcuServer::MainTask()
         else
         {
             //当是app发来的消息时
+
+            
         }
     }
     close(sockfd);
