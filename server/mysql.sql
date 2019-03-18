@@ -9,4 +9,4 @@ Create table Machine_base (
 	Machine_Lastack integer
 	);
 
-
+2

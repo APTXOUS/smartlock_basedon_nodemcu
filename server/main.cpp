@@ -17,11 +17,14 @@ using namespace std;
 const int BUFF_LEN = 200;
 #define AWAKE_COMMAND 15
 
+#define SMART_LOCK 99
+
 struct package
 {
+    char IfM;       //是客户端还是app
     char Id[15];    //15位设备ID
-    char Divide;    //是否分包 0：不分包 其他：分包的标示
-    char Seq;       //第几个包
+    char Divide;    //包的标示
+    char Seq;       //为0表示不分包·，不为0表示为第几个包
     char Len;       //包长度
     char Type;      //包类型
     char Info[100]; //属性
@@ -39,14 +42,16 @@ struct machine
 class NodeMcuServer
 {
   public:
-    void save_machince_info(struct machine info, struct package pack);
+    void save_machince_info(struct machine *info, struct package pack);
     void do_package_command(struct package info);
     void react_to_package(char *buf, int count, struct package &pak);
-    void send_ack(struct package pak);
+    void send_ack(struct sockaddr_in addr, struct package pack);
     void init_server();
     void MainTask();
     void init_mysql();
-    int get_machine_info(struct machine *info, struct package pack) void print(const char *info)
+    int get_machine_info(struct machine *info, struct package pack);
+    int add_machine_info(struct machine *info, struct package pack);
+    void print(const char *info)
     {
         printf(info);
     }
@@ -81,25 +86,49 @@ void NodeMcuServer::init_mysql()
     print("-----数据库连接成功-----\n");
 }
 
-int NodeMcuServer::get_machine_info(struct machine *info, struct package pack)
+int NodeMcuServer::add_machine_info(struct machine *info, struct package pack)
 {
+    char select_user[255];
     MYSQL_RES *result;
-    MYSQL_ROW row;
-    string query = "select * from Machine_base where Machine_Id =";
-    query += pack.Id;
-    query += ";";
-    if (mysql_query(mysql, query.data()))
+    sprintf(select_user, "INSERT INTO Machine_base (Machine_id,Machine_Ip,Machine_Port,Machine_Type,Machine_Lastack) VALUES (\"%s\",%d,%d,%d,%d);", info->id, info->addr_ip, info->addr_port, info->type, info->last_ack);
+    if (mysql_query(mysql, select_user))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
-        return;
+        return -1;
     }
     if ((result = mysql_store_result(mysql)) == NULL)
     {
         cout << "mysql_store_result failed" << endl;
-        return;
+        return -1;
     }
     /* 打印当前查询到的记录的数量 */
     cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
+    mysql_free_result(result);
+    return 0;
+}
+
+int NodeMcuServer::get_machine_info(struct machine *info, struct package pack)
+{
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    char select_user[255];
+    //sprintf(select_user, "select * from Machine_base where Machine_id = \"%s\"",pack.Id);
+    sprintf(select_user, "select * from Machine_base where Machine_id = \"XXXXXXXXXXXXXXX\"");
+    memcpy(select_user+47,pack.Id,15);
+    cout << select_user << endl;
+    if (mysql_query(mysql, select_user))
+    {
+        cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+        exit(-1);
+    }
+    if ((result = mysql_store_result(mysql)) == NULL)
+    {
+        cout << "mysql_store_result failed" << endl;
+        exit(-1);
+    }
+    /* 打印当前查询到的记录的数量 */
+    cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
+
     if ((int)mysql_num_rows(result) == 0)
     {
         return -1;
@@ -107,22 +136,22 @@ int NodeMcuServer::get_machine_info(struct machine *info, struct package pack)
     else
     {
         row = mysql_fetch_row(result);
-        memcpy(info.id, row[0], 15);
-        info.addr_ip = atoi(row[1]);
-        info.addr_port = atoi(row[2]);
-        info.type = atoi(row[3]);
-        info.last_ack = atoi(row[4]);
+        memcpy(info->id, row[0], 15);
+        info->addr_ip = atoi(row[1]);
+        info->addr_port = atoi(row[2]);
+        info->type = atoi(row[3]);
+        info->last_ack = atoi(row[4]);
     }
     /* 释放result */
     mysql_free_result(result);
     return 0;
 }
 
-void NodeMcuServer::save_machince_info(struct machine info, struct package pack)
+void NodeMcuServer::save_machince_info(struct machine *info, struct package pack)
 {
     char select_user[255];
     MYSQL_RES *result;
-    sprintf(select_user, "select * from user where UserName='%s'", body.userName);
+    // sprintf(select_user, "select * from user where UserName='%s'", body.userName);
 }
 
 void NodeMcuServer::do_package_command(struct package info)
@@ -183,7 +212,14 @@ void NodeMcuServer::MainTask()
             this->react_to_package(buf, count, temp);
             int flag = this->get_machine_info(&now_machine, temp);
             if (flag == -1)
+            {
+                now_machine.addr_ip = cli.sin_addr.s_addr;
+                now_machine.addr_port = cli.sin_port;
+                memcpy(now_machine.id, temp.Id, 15);
+                now_machine.last_ack = (temp.Divide + 1) % 255;
+                now_machine.type = SMART_LOCK;
                 this->add_machine_info(&now_machine, temp);
+            }
             else
             {
                 if (now_machine.last_ack != temp.Divide)
@@ -194,17 +230,15 @@ void NodeMcuServer::MainTask()
                 else
                 {
                     //收到了新的消息
-                    this->save_machince_info(temp); //保存设备最新地址
-                    this->do_package_command(temp); //应对包命令
-                    this->send_ack(cli, temp);      //发送ack
+                    this->save_machince_info(&now_machine, temp); //保存设备最新地址
+                    this->do_package_command(temp);               //应对包命令
+                    this->send_ack(cli, temp);                    //发送ack
                 }
             }
         }
         else
         {
             //当是app发来的消息时
-
-            
         }
     }
     close(sockfd);
@@ -225,10 +259,15 @@ int main()
     NodeMcuServer server;
     server.init_server();
     server.init_mysql();
-
-    struct package temp;
-    struct machine m;
-    memcpy(temp.Id, "123456789012345", 15);
-    server.get_machine_info(&m, temp);
+    struct machine test1;
+    memcpy(test1.id, "我感觉有点奇怪a", 15);
+    test1.addr_ip = 1232131;
+    test1.addr_port = 1223;
+    test1.type = 1;
+    test1.last_ack = 129;
+    struct package p;
+    memcpy(p.Id, "我感觉有点奇怪a", 15);
+    //server.add_machine_info(&test1,p);
+    server.get_machine_info(&test1, p);
     return 0;
 }
