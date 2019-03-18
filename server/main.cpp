@@ -18,6 +18,9 @@ const int BUFF_LEN = 200;
 #define AWAKE_COMMAND 15
 
 #define SMART_LOCK 99
+#define ACK_ID "!!!!!!!!!!!!!!!"
+#define ACK_PACKAGE 0
+#define PACKAGE_MIN 20
 
 struct package
 {
@@ -29,6 +32,8 @@ struct package
     char Type;      //包类型
     char Info[100]; //属性
 };
+
+
 
 struct machine
 {
@@ -59,6 +64,7 @@ class NodeMcuServer
   protected:
     int sockfd;
     MYSQL *mysql;
+    struct package ACK;
 };
 
 void NodeMcuServer::init_mysql()
@@ -163,8 +169,11 @@ void NodeMcuServer::react_to_package(char *buf, int count, struct package &pak)
     memcpy(&pak, buf, count);
 }
 
-void NodeMcuServer::send_ack(struct sockaddr_in addr, struct package pack)
+void NodeMcuServer::send_ack(struct sockaddr_in addr, struct package  pack)
 {
+    socklen_t len = sizeof(sockaddr_in);
+    this->ACK.Divide=pack.Divide;
+    sendto(sockfd,(char *)&ACK, PACKAGE_MIN, 0, (struct sockaddr*)&addr, len);
 }
 
 void NodeMcuServer::init_server()
@@ -184,6 +193,13 @@ void NodeMcuServer::init_server()
         exit(-1);
     }
     print("-----服务器开始运行-----\n");
+    memcpy(this->ACK.Id,ACK_ID,15);
+    this->ACK.IfM='S';
+    this->ACK.Divide=0;
+    this->ACK.Seq=0;
+    this->ACK.Len=20;
+    this->ACK.Type=ACK_PACKAGE;
+
 }
 
 void NodeMcuServer::MainTask()
@@ -267,7 +283,17 @@ int main()
     test1.last_ack = 129;
     struct package p;
     memcpy(p.Id, "我感觉有点奇怪a", 15);
+    p.Divide=1;
+    struct sockaddr_in cli;
+    cli.sin_family=AF_INET;
+    cli.sin_port = htons(1234);
+    cli.sin_addr.s_addr = inet_addr("148.70.242.63");
+    while(1)
+    {
+        server.send_ack(cli,p);
+        sleep(1);
+    }    
     //server.add_machine_info(&test1,p);
-    server.get_machine_info(&test1, p);
+    //server.get_machine_info(&test1, p);
     return 0;
 }
