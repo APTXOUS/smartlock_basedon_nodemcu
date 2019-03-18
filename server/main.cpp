@@ -33,8 +33,6 @@ struct package
     char Info[100]; //属性
 };
 
-
-
 struct machine
 {
     char id[15];
@@ -120,17 +118,17 @@ int NodeMcuServer::get_machine_info(struct machine *info, struct package pack)
     char select_user[255];
     //sprintf(select_user, "select * from Machine_base where Machine_id = \"%s\"",pack.Id);
     sprintf(select_user, "select * from Machine_base where Machine_id = \"XXXXXXXXXXXXXXX\"");
-    memcpy(select_user+47,pack.Id,15);
+    memcpy(select_user + 47, pack.Id, 15);
     cout << select_user << endl;
     if (mysql_query(mysql, select_user))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
-        exit(-1);
+        return (-1);
     }
     if ((result = mysql_store_result(mysql)) == NULL)
     {
         cout << "mysql_store_result failed" << endl;
-        exit(-1);
+        return (-1);
     }
     /* 打印当前查询到的记录的数量 */
     cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
@@ -156,8 +154,27 @@ int NodeMcuServer::get_machine_info(struct machine *info, struct package pack)
 void NodeMcuServer::save_machince_info(struct machine *info, struct package pack)
 {
     char select_user[255];
+    char where_use[255] = "where Machine_id=\"YYYYYYYYYYYYYYYYYYYY\"";
+    memcpy(where_use + 18, info->id, 15);
     MYSQL_RES *result;
     // sprintf(select_user, "select * from user where UserName='%s'", body.userName);
+
+    sprintf(select_user, "update Machine_base set Machine_Ip= %d,Machine_Port=%d,Machine_Type=%d,Machine_Lastack=%d", info->addr_ip, info->addr_port, info->type, info->last_ack);
+    strcat(select_user, where_use);
+
+    cout << select_user << endl;
+    if (mysql_query(mysql, select_user))
+    {
+        cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+        return (-1);
+    }
+    if ((result = mysql_store_result(mysql)) == NULL)
+    {
+        cout << "mysql_store_result failed" << endl;
+        return (-1);
+    }
+    /* 打印当前查询到的记录的数量 */
+    cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
 }
 
 void NodeMcuServer::do_package_command(struct package info)
@@ -169,11 +186,11 @@ void NodeMcuServer::react_to_package(char *buf, int count, struct package &pak)
     memcpy(&pak, buf, count);
 }
 
-void NodeMcuServer::send_ack(struct sockaddr_in addr, struct package  pack)
+void NodeMcuServer::send_ack(struct sockaddr_in addr, struct package pack)
 {
     socklen_t len = sizeof(sockaddr_in);
-    this->ACK.Divide=pack.Divide;
-    sendto(sockfd,(char *)&ACK, PACKAGE_MIN, 0, (struct sockaddr*)&addr, len);
+    this->ACK.Divide = pack.Divide;
+    sendto(sockfd, (char *)&ACK, PACKAGE_MIN, 0, (struct sockaddr *)&addr, len);
 }
 
 void NodeMcuServer::init_server()
@@ -193,13 +210,12 @@ void NodeMcuServer::init_server()
         exit(-1);
     }
     print("-----服务器开始运行-----\n");
-    memcpy(this->ACK.Id,ACK_ID,15);
-    this->ACK.IfM='S';
-    this->ACK.Divide=0;
-    this->ACK.Seq=0;
-    this->ACK.Len=20;
-    this->ACK.Type=ACK_PACKAGE;
-
+    memcpy(this->ACK.Id, ACK_ID, 15);
+    this->ACK.IfM = 'S';
+    this->ACK.Divide = 0;
+    this->ACK.Seq = 0;
+    this->ACK.Len = 20;
+    this->ACK.Type = ACK_PACKAGE;
 }
 
 void NodeMcuServer::MainTask()
@@ -246,6 +262,11 @@ void NodeMcuServer::MainTask()
                 else
                 {
                     //收到了新的消息
+                    ow_machine.addr_ip = cli.sin_addr.s_addr;
+                    now_machine.addr_port = cli.sin_port;
+                    memcpy(now_machine.id, temp.Id, 15);
+                    now_machine.last_ack = (temp.Divide + 1) % 255;
+                    now_machine.type = SMART_LOCK;
                     this->save_machince_info(&now_machine, temp); //保存设备最新地址
                     this->do_package_command(temp);               //应对包命令
                     this->send_ack(cli, temp);                    //发送ack
@@ -283,16 +304,16 @@ int main()
     test1.last_ack = 129;
     struct package p;
     memcpy(p.Id, "我感觉有点奇怪a", 15);
-    p.Divide=1;
+    p.Divide = 1;
     struct sockaddr_in cli;
-    cli.sin_family=AF_INET;
+    cli.sin_family = AF_INET;
     cli.sin_port = htons(1234);
     cli.sin_addr.s_addr = inet_addr("148.70.242.63");
-    while(1)
+    while (1)
     {
-        server.send_ack(cli,p);
+        server.send_ack(cli, p);
         sleep(1);
-    }    
+    }
     //server.add_machine_info(&test1,p);
     //server.get_machine_info(&test1, p);
     return 0;
