@@ -33,6 +33,8 @@ struct package
     char Info[100]; //属性
 };
 
+
+
 struct machine
 {
     char id[15];
@@ -45,7 +47,7 @@ struct machine
 class NodeMcuServer
 {
   public:
-    void save_machince_info(struct machine *info, struct package pack);
+    int save_machince_info(struct machine *info, struct package pack);
     void do_package_command(struct package info);
     void react_to_package(char *buf, int count, struct package &pak);
     void send_ack(struct sockaddr_in addr, struct package pack);
@@ -151,15 +153,15 @@ int NodeMcuServer::get_machine_info(struct machine *info, struct package pack)
     return 0;
 }
 
-void NodeMcuServer::save_machince_info(struct machine *info, struct package pack)
+int NodeMcuServer::save_machince_info(struct machine *info, struct package pack)
 {
     char select_user[255];
-    char where_use[255] = "where Machine_id=\"YYYYYYYYYYYYYYYYYYYY\"";
+    char where_use[255] = "where Machine_id=\"YYYYYYYYYYYYYYY\"";
     memcpy(where_use + 18, info->id, 15);
     MYSQL_RES *result;
     // sprintf(select_user, "select * from user where UserName='%s'", body.userName);
 
-    sprintf(select_user, "update Machine_base set Machine_Ip= %d,Machine_Port=%d,Machine_Type=%d,Machine_Lastack=%d", info->addr_ip, info->addr_port, info->type, info->last_ack);
+    sprintf(select_user, "update Machine_base set Machine_Ip= %d,Machine_Port=%d,Machine_Type=%d,Machine_Lastack=%d ", info->addr_ip, info->addr_port, info->type, info->last_ack);
     strcat(select_user, where_use);
 
     cout << select_user << endl;
@@ -262,7 +264,7 @@ void NodeMcuServer::MainTask()
                 else
                 {
                     //收到了新的消息
-                    ow_machine.addr_ip = cli.sin_addr.s_addr;
+                    now_machine.addr_ip = cli.sin_addr.s_addr;
                     now_machine.addr_port = cli.sin_port;
                     memcpy(now_machine.id, temp.Id, 15);
                     now_machine.last_ack = (temp.Divide + 1) % 255;
@@ -276,6 +278,27 @@ void NodeMcuServer::MainTask()
         else
         {
             //当是app发来的消息时
+            this->react_to_package(buf, count, temp);
+            //app 有哪几个功能啊草
+            // 预约功能
+            // 先预约时段
+            // 每半个小时为一个分组
+            // 告诉服务器我要预约这个智能锁
+            // 放入数据库，保存
+            // 发送数据给NodeMcu 保存
+            // 1.NodeMcu保存数据，检查时间
+            //   到时间给服务器回发消息？
+            // 2.或者app查询数据库发现到时间了
+            //   发送给NodeMcu开门
+            // 
+            // nodemcu进入认证模式，
+            // 1.指纹本地认证
+            // 2.语音认证
+            // 3.app远程认证
+            // 
+            // 草早知道就不写阻塞模式了
+            // 
+            
         }
     }
     close(sockfd);
@@ -296,25 +319,6 @@ int main()
     NodeMcuServer server;
     server.init_server();
     server.init_mysql();
-    struct machine test1;
-    memcpy(test1.id, "我感觉有点奇怪a", 15);
-    test1.addr_ip = 1232131;
-    test1.addr_port = 1223;
-    test1.type = 1;
-    test1.last_ack = 129;
-    struct package p;
-    memcpy(p.Id, "我感觉有点奇怪a", 15);
-    p.Divide = 1;
-    struct sockaddr_in cli;
-    cli.sin_family = AF_INET;
-    cli.sin_port = htons(1234);
-    cli.sin_addr.s_addr = inet_addr("148.70.242.63");
-    while (1)
-    {
-        server.send_ack(cli, p);
-        sleep(1);
-    }
-    //server.add_machine_info(&test1,p);
-    //server.get_machine_info(&test1, p);
+    server.MainTask();
     return 0;
 }
