@@ -13,14 +13,16 @@
         exit("输入的密码与确认密码不相等！");
     }
 
-    $userName = $_POST['userName'];
+    $userName = $_POST['uid'];
     $domain = $_POST['domain'];
     $userName = $userName . $domain;
 
     // 判断用户名是否重复
-    $userNameSQL = "select * from users where userName = '$userName'";
+    $userNameSQL = "select * from user where uid = '$userName'";
+    echo $userNameSQL ;
     getConnect();
     $resultSet = mysql_query($userNameSQL);
+    echo $resultSet;
     if (mysql_num_rows($resultSet) > 0) {
         exit("用户名已被占用，请更换其他用户名");
     }

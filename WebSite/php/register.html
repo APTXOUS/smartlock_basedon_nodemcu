@@ -4,15 +4,19 @@
 <h2>用户注册登录系统</h2>
 <hr>
 <form action="register.php" method="POST" enctype="multipart/form-data">
-    用户名：
-    <input type="text" name="userName" size="20" maxlength="15" placeholder="必须填写用户名">
+    邮箱：
+    <input type="text" name="uid" size="20" maxlength="15" placeholder="必须填写邮箱">
     @
     <select name="domain" id="">
         <option value="@163.com" selected>163.com</option>
         <option value="@126.com">126.com</option>
+        <option value="@qq.com">qq.com</option>
     </select>
     <br>
 
+    用户名
+    <input type="text" name="username" size="20" maxlength="15" placeholder="必须填写用户名">
+    <br>
     登录密码：
     <input type="password" name="password" size="20" maxlength="15">
     <br>
@@ -20,7 +24,7 @@
     确认密码：
     <input type="password" name="confirmPassword" size="20" maxlength="15">
     <br>
-
+<!-- 
     选择性别：
     <input type="radio" name="sex" value="male" checked>男
     <input type="radio" name="sex" value="female">女
@@ -40,7 +44,7 @@
     备注信息：
     <textarea name="remark" cols="30" rows="4" placeholder="请填写备注信息"></textarea>
     <br>
-
+/input-group -->
     <input type="submit" name="submit" value="注册">
     <input type="reset" name="cancel" value="重填">
 </form>

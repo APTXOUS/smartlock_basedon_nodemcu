@@ -1,17 +1,16 @@
+
 <?php
-    include_once("function/database.php");
+    header('Content-Type:text/html; charset=gb2312;');
+    include_once("database.php");
     // $userName = $_POST['userName'];
     // $password = $_POST['password'];
     $userName = addslashes($_POST['userName']);
     $password = addslashes($_POST['password']);
-    getConnect();
-    $loginSQL = "select count(*) from users where userName='$userName' and password='$password'";
+
+    $mysqli=getConnect();
+    $loginSQL = "select count(*) from security where uid= '$userName' AND password='$password'";
     echo $loginSQL; 
-    $resultLogin = mysql_query($loginSQL);
-    if (mysql_num_rows($resultLogin) > 0) {
-        echo "µÇÂ¼³É¹¦";
-    } else {
-        echo "µÇÂ¼Ê§°Ü";
-    }
-    closeConnect();
+    $result = $mysqli->query($loginSQL);
+    echo $result->num_rows;
+    //closeConnect();
 ?>
