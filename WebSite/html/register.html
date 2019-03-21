@@ -35,23 +35,24 @@
     <div class="container">
         <div class="row row-centered">
             <div class="well col-md-6 col-centered">
-                <h2>欢迎登录</h2>
 
-                <form action="login_process.php" method="POST">
-                    邮箱：
-                    <div class="input-group-add">
-                        <input type="text" name="userName" class="form-control" placeholder="请输入注册的邮箱">
-                        <br>
-                    </div>
-
-                    密码：
-                    <div class="input-group-add">
-                        <input type="password" name="password" class="form-control" size="20" maxlength="15">
-                        <br>
-                    </div>
-                    <input class="btn btn-default" type="submit" value="登陆">
+                <h2>用户注册登录系统</h2>
+                <hr>
+                <form action="../php/register.php" method="POST" enctype="multipart/form-data">
                     
-                    <input class="btn btn-default" type="button" onclick="window.location.href='register.html'" value="注册">
+                    邮箱：<input type="text" name="uid"class="form-control" placeholder="必须填写邮箱">
+
+                   
+                    用户名
+                    <input type="text" name="username" class="form-control"placeholder="必须填写用户名">
+                    登录密码：
+                    <input type="password" name="password" class="form-control">
+
+                    确认密码：
+                    <input type="password" name="confirmPassword" class="form-control">
+                    <br>
+                    <input class="btn btn-default" type="submit" name="submit" value="注册">
+                    <input class="btn btn-default" type="reset" name="cancel" value="重填">
                 </form>
             </div>
         </div>
