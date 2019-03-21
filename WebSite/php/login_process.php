@@ -1,5 +1,6 @@
 
 <?php
+    session_start();
     header('Content-Type:text/html; charset=gb2312;');
     include_once("database.php");
     // $userName = $_POST['userName'];
@@ -13,7 +14,8 @@
     $row=$result->fetch_assoc();
     if($row["count(*)"]==1)
     {
-        header("refresh:0;url=../html/welcome.html");//如果成功跳转至welcome.html页面
+        $_SESSION["uid"] = $persion["uid"];
+        header("refresh:0;url=../html/homepage.html");//如果成功跳转至homepage.html页面
         exit;
     }
     else
