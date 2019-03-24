@@ -21,7 +21,7 @@ function OutputTitle(){
   
 
 function OutputModal($Machineid){
-    echo '<div class="modal fade" id="'.$Machineid.'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    echo '<div class="modal fade" id="'.$Machineid."Modal".'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -89,14 +89,14 @@ function OutputMachine($Machname){
               </div>
               <div class="row" style="float:left;">
                   <div class=" col-xs-4">
-                      <button class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#'.$Machname.'">
-                          预约
-                      </button>
+                    <button class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#'.$Machname."Modal".'">
+                        预约
+                    </button>
                   </div>
                   <div class="col-xs-4">
-                      <a href="html/login.html" type="button" class="btn btn-default btn-lg btn-block">
-                          使用
-                      </a>
+                    <button class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#'.$Machname."Use".'">
+                        使用
+                    </button>
 
                   </div>
                   <div class="col-xs-4">
@@ -110,7 +110,8 @@ function OutputMachine($Machname){
                           </ul>
                       </div>
                   </div>'
-                  .OutputModal($Machname).
+                  .OutputModal($Machname)
+                  .OutputUse($Machname).
               '</div>
           </div>
       </div>
@@ -118,6 +119,39 @@ function OutputMachine($Machname){
 </div>';
 }
 
+function OutputUse($Machineid)
+{
+    echo '<div class="modal fade" id="'.$Machineid."Use".'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                 '.$Machineid.'使用界面
+                </h4>
+            </div>
+            <div class="modal-body">
+                选择你要使用的验证方式
+                <input type="text" list="securitylist"class="form-control">
+                <datalist id="securitylist">
+                <option>手机验证</option>
+                <option>口令验证</option>
+                <option>指纹验证</option>
+                </datalist>         
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+                <button type="button" class="btn btn-primary">
+                    开始验证
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>';
+}
 
 ?>
 
