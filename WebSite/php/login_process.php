@@ -14,8 +14,8 @@
     $row=$result->fetch_assoc();
     if($row["count(*)"]==1)
     {
-        $_SESSION["uid"] = $persion["uid"];
-        header("refresh:0;url=../html/homepage.html");//如果成功跳转至homepage.html页面
+        $_SESSION["uid"] = $userName;
+        header("refresh:0;url=../php/homepage.php");//如果成功跳转至homepage.html页面
         exit;
     }
     else
