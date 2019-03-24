@@ -14,7 +14,19 @@
     }
 
     function closeConnect() {
-
+        ;
     }
 
+    function strToGBK($strText)
+    {
+        $encode = mb_detect_encoding($strText, array('UTF-8','GB2312','GBK'));
+        if($encode == "UTF-8")
+        {
+            return @iconv('UTF-8','GB18030',$strText);
+        }
+        else
+        {
+            return $strText;
+        }
+    }
 ?>

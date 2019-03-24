@@ -132,22 +132,26 @@ function OutputUse($Machineid)
                  '.$Machineid.'使用界面
                 </h4>
             </div>
-            <div class="modal-body">
-                选择你要使用的验证方式
-                <input type="text" list="securitylist"class="form-control">
-                <datalist id="securitylist">
-                <option>手机验证</option>
-                <option>口令验证</option>
-                <option>指纹验证</option>
-                </datalist>         
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                </button>
-                <button type="button" class="btn btn-primary">
-                    开始验证
-                </button>
-            </div>
+            <form action="../php/use_Machine.php" method="POST">
+                <div class="modal-body">
+                    机器:
+                    <input type="text" name="machineid" class="form-control" value="'.$Machineid.'" readonly="readonly">
+                    选择你要使用的验证方式:
+                    <input type="text" name="identity" list="securitylist"class="form-control">
+                    <datalist id="securitylist">
+                    <option>手机验证</option>
+                    <option>口令验证</option>
+                    <option>指纹验证</option>
+                    </datalist>         
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        开始验证
+                    </button>
+                </div>
+            </form>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
 </div>';
