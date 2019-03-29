@@ -220,6 +220,16 @@ void NodeMcuServer::init_server()
     this->ACK.Type = ACK_PACKAGE;
 }
 
+void showPackage(struct package pack){
+    cout<<pack.IfM<<endl;
+    cout<<pack.Id<<endl;
+    cout<<(int)pack.Divide<<endl;
+    cout<<(int)pack.Seq<<endl;
+    cout<<(int)pack.Len<<endl;
+    cout<<(int)pack.Type<<endl;
+    cout<<pack.Info<<endl;
+}
+
 void NodeMcuServer::MainTask()
 {
     print("-----开始监听端口-----\n");
@@ -236,7 +246,7 @@ void NodeMcuServer::MainTask()
             printf("recieve data fail!\n");
             continue;
         }
-        printf("server recv: %s\n", buf);
+        printf("server recv:length:%d, data: %s\n",count,buf);
         printf("recv from: %s:%d\n", inet_ntoa(cli.sin_addr), cli.sin_port);
         memcpy((char *)&temp, buf, count);
         if (buf[0] == 'N')
@@ -279,6 +289,7 @@ void NodeMcuServer::MainTask()
         {
             //当是app发来的消息时
             this->react_to_package(buf, count, temp);
+            showPackage(temp);
             //app 有哪几个功能啊草
             // 预约功能
             // 先预约时段

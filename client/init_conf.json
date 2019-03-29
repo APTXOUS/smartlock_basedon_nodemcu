@@ -1,1 +1,1 @@
-{"init_file":"init_client.lua"}
+{"init_file":"init_client.lua","work_file":"socket_connect.lua"}

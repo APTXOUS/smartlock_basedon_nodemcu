@@ -133,7 +133,7 @@ function OutputUse($Machineid)
                 </h4>
             </div>
             <form action="../php/use_Machine.php" method="POST">
-                <div class="modal-body">
+                <div class="modal-body"> 
                     机器:
                     <input type="text" name="machineid" class="form-control" value="'.$Machineid.'" readonly="readonly">
                     选择你要使用的验证方式:

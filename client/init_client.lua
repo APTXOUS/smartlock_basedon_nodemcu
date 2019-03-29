@@ -78,21 +78,21 @@ wifi.ap.config({ssid='nodemcu', pwd='12345678'})
 wifi.sta.connect()
 wifi.sta.autoconnect(1)
 
-tmr.alarm(1, 1000, tmr.ALARM_AUTO, function()
-    if wifi.sta.getip() == nil then
-        print('Waiting for IP ...')
-    else
-        print('IP is ' .. wifi.sta.getip())
-        local config_save=wifi.sta.getconfig(true)
-        print(config_save["ssid"])
-        config_obj = sjson.encoder(config_save)
-        config_string=config_obj:read()
-        fd=file.open("wifi_conf.json","w+")
-        fd:writeline(config_string)
-        fd:close()
-        tmr.stop(1)
-    end
-end)
+--tmr.alarm(1, 1000, tmr.ALARM_AUTO, function()
+--    if wifi.sta.getip() == nil then
+--        print('Waiting for IP ...')
+--    else
+--        print('IP is ' .. wifi.sta.getip())
+--        local config_save=wifi.sta.getconfig(true)
+--        print(config_save["ssid"])
+--        config_obj = sjson.encoder(config_save)
+--        config_string=config_obj:read()
+--        fd=file.open("wifi_conf.json","w+")
+--        fd:writeline(config_string)
+--        fd:close()
+--        tmr.stop(1)
+--    end
+--end)
 
 ---------------------
 -- http
