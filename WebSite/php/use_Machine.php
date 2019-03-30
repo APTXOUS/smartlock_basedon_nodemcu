@@ -5,14 +5,13 @@
     include_once("database.php");
     include_once("udpfunction.php");
     $userid=$_SESSION["uid"];
-    echo  $_SESSION["uid"];
-    echo $userid;
+    //echo $userid;
     $identity= addslashes($_POST['identity']);
     $identity=iconv("UTF-8","gbk//TRANSLIT",$identity);
-    echo $identity;
+    //echo $identity;
     $machineid= addslashes($_POST['machineid']);
     $machineid=iconv("UTF-8","gbk//TRANSLIT",$machineid);
-    echo $machineid;
+    //echo $machineid;
     
 
 
@@ -31,9 +30,10 @@
         $Len=35+20;
         $Type=10;//10为手机验证
         $message="ATHISISTHEWEBAPP";
-        $package=sprintf("%s%c%c%c%c%20s15s",$message,$Divide,$Seq,$Len,$Type,$userid,$machineid); 
-        echo $package;
+        $package=sprintf("%s%c%c%c%c%20s%15s",$message,$Divide,$Seq,$Len,$Type,$userid,$machineid); 
+        //echo $package;
         send_udp_message($host, $port, $package);
+        header("refresh:0;url=../php/homepage.php");//如果成功跳转至homepage.html页面
     }
     else if($identity=="口令验证")
     {

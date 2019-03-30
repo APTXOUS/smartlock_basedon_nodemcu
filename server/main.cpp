@@ -56,6 +56,7 @@ class NodeMcuServer
     void init_mysql();
     int get_machine_info(struct machine *info, struct package pack);
     int add_machine_info(struct machine *info, struct package pack);
+    int get_machine_info(struct machine *info);
     void print(const char *info)
     {
         printf(info);
@@ -136,6 +137,45 @@ int NodeMcuServer::get_machine_info(struct machine *info, struct package pack)
     cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
 
     if ((int)mysql_num_rows(result) == 0)
+    {
+        return -1;
+    }
+    else
+    {
+        row = mysql_fetch_row(result);
+        memcpy(info->id, row[0], 15);
+        info->addr_ip = atoi(row[1]);
+        info->addr_port = atoi(row[2]);
+        info->type = atoi(row[3]);
+        info->last_ack = atoi(row[4]);
+    }
+    /* 释放result */
+    mysql_free_result(result);
+    return 0;
+}
+
+int NodeMcuServer::get_machine_info(struct machine *info)
+{
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    char select_user[255];
+    //sprintf(select_user, "select * from Machine_base where Machine_id = \"%s\"",pack.Id);
+    sprintf(select_user, "select * from Machine_base where Machine_id = \"XXXXXXXXXXXXXXX\"");
+    memcpy(select_user + 47, info->id,15);
+    cout << select_user << endl;
+    if (mysql_query(mysql, select_user))
+    {
+        cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+        return (-1);
+    }
+    if ((result = mysql_store_result(mysql)) == NULL)
+    {
+        cout << "mysql_store_result failed" << endl;
+        return (-1);
+    }
+    /* 打印当前查询到的记录的数量 */
+    cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
+     if ((int)mysql_num_rows(result) == 0)
     {
         return -1;
     }
@@ -239,6 +279,7 @@ void NodeMcuServer::MainTask()
     char buf[BUFF_LEN];
     while (1)
     {
+        memset(buf,0,sizeof(buf));
         struct package temp;
         count = recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr *)&cli, &len);
         if (count == -1)
@@ -285,11 +326,31 @@ void NodeMcuServer::MainTask()
                 }
             }
         }
+        else if(buf[0] == 'M')//用来测试
+        {
+            socklen_t len = sizeof(cli);
+            cout<<"send:"<<sendto(sockfd, buf, count, 0,  (struct sockaddr *)&cli, len)<<endl;
+        }
         else
         {
             //当是app发来的消息时
             this->react_to_package(buf, count, temp);
             showPackage(temp);
+
+            if(temp.Type==10)//手机验证包
+            {
+                char userid[20];
+                memcpy(userid,temp.Info,20);
+                struct machine info;
+                memcpy(info.id,temp.Info+20,15);
+                int flag = this->get_machine_info(&info);
+                struct sockaddr_in send_machine;
+                send_machine=cli;
+                send_machine.sin_addr.s_addr=info.addr_ip;
+                send_machine.sin_port=info.addr_port;
+                cout<<"send:"<<sendto(sockfd, "TESTLINK", 8, 0,  (struct sockaddr *)&send_machine, len)<<endl;
+            }
+
             //app 有哪几个功能啊草
             // 预约功能
             // 先预约时段

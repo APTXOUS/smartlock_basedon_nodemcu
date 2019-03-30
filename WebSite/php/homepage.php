@@ -64,7 +64,7 @@ function OutputMachine($Machname){
   <div class="panel panel-default">
       <div class="panel-heading">
           <h3 class="panel-title">
-              NodeMcu网关
+              '.$Machname.'
           </h3>
       </div>
       <div class="panel-body">
@@ -156,7 +156,17 @@ function OutputUse($Machineid)
     </div><!-- /.modal -->
 </div>';
 }
-
+function OutputAllMachine()
+{
+    $mysqli=getConnect();
+    $machineselect="select * from Machine_base";
+    $result = $mysqli->query($machineselect);
+    while($row=$result->fetch_assoc()){
+        OutputMachine(iconv('GB2312', 'UTF-8', $row["Machine_id"]));
+    }
+    $result->close();
+    $mysqli->close();
+}
 ?>
 
 
@@ -216,7 +226,7 @@ function OutputUse($Machineid)
     <div id="myTabContent" class="tab-content">
         <div class="tab-pane fade in active" id="home">
             <div class="container-fluid">
-                <?php OutputMachine("test_demo"); ?>
+                <?php OutputAllMachine(); ?>
             </div>	
 
             
