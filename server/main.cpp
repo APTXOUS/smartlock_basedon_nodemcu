@@ -22,6 +22,9 @@ const int BUFF_LEN = 200;
 #define ACK_PACKAGE 0
 #define PACKAGE_MIN 20
 
+
+#define OPEN_COMMAND 12 //开锁
+
 struct package
 {
     char IfM;       //是客户端还是app
@@ -348,8 +351,15 @@ void NodeMcuServer::MainTask()
                 send_machine=cli;
                 send_machine.sin_addr.s_addr=info.addr_ip;
                 send_machine.sin_port=info.addr_port;
-                cout<<"send:"<<sendto(sockfd, "TESTLINK", 8, 0,  (struct sockaddr *)&send_machine, len)<<endl;
+                char openthemachine[20]="STHISISSERVERMEG";
+                openthemachine[16]=0;
+                openthemachine[17]=0;
+                openthemachine[18]=20;
+                openthemachine[19]=OPEN_COMMAND;//
+                cout<<"send:"<<sendto(sockfd, openthemachine, 20, 0,  (struct sockaddr *)&send_machine, len)<<endl;
             }
+
+            
 
             //app 有哪几个功能啊草
             // 预约功能
