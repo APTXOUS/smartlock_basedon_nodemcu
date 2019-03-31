@@ -5,6 +5,19 @@
 
 -- 监听
 -- 指示变量
+
+--
+--struct package
+--{
+--    char IfM;       //是客户端还是app
+--    char Id[15];    //15位设备ID
+--    char Divide;    //包的标示
+--    char Seq;       //为0表示不分包·，不为0表示为第几个包
+--    char Len;       //包长度
+--    char Type;      //包类型
+--    char Info[100]; //属性
+--};
+--
 IFfinger=0
 IFsound=0
 
@@ -33,6 +46,25 @@ Divide=0;
 
 udpSocket:on("receive", function(s, data, port, ip)
     print(string.format("received '%s' from %s:%d", data, ip, port))
+    command_type=string.byte(data, 20,20);
+    print(command_type);
+    if(command_type==12)
+    then
+        gpio.mode(5, gpio.OUTPUT)
+        print(gpio.read(5),"\n")
+        gpio.write(5, gpio.HIGH)
+        print(gpio.read(5),"\n")
+        tmr.delay(100000)
+        gpio.write(5, gpio.LOW)
+        print(gpio.read(5),"\n")
+        tmr.alarm(2, 4000, tmr.ALARM_SINGLE, 
+        function()
+            gpio.write(5, gpio.HIGH)
+            print(gpio.read(5),"\n")
+        end)
+    elseif(command_type==13)
+    then
+    end
     --这里写要干的事情
 end)
 

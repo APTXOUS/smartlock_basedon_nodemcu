@@ -1,12 +1,13 @@
-uart.setup(0, 115200, 8, uart.PARITY_NONE, uart.STOPBITS_1, 1)
--- when 4 chars is received.
+gpio.mode(3, gpio.OUTPUT)
+print(gpio.read(5),"\n")
 
+while(1)
+do
+gpio.write(3, gpio.HIGH)
+print(gpio.read(3),"\n")
+tmr.delay(100000)
+gpio.write(3, gpio.LOW)
+print(gpio.read(3),"\n")
+tmr.delay(100000)
+end
 
-
-uart.on("data", 4,
-  function(data)
-    print("receive from uart:", data)
-    if data=="quit" then
-      uart.on("data") -- unregister callback function
-    end
-end, 0)

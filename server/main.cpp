@@ -22,7 +22,6 @@ const int BUFF_LEN = 200;
 #define ACK_PACKAGE 0
 #define PACKAGE_MIN 20
 
-
 #define OPEN_COMMAND 12 //开锁
 
 struct package
@@ -35,8 +34,6 @@ struct package
     char Type;      //包类型
     char Info[100]; //属性
 };
-
-
 
 struct machine
 {
@@ -164,7 +161,7 @@ int NodeMcuServer::get_machine_info(struct machine *info)
     char select_user[255];
     //sprintf(select_user, "select * from Machine_base where Machine_id = \"%s\"",pack.Id);
     sprintf(select_user, "select * from Machine_base where Machine_id = \"XXXXXXXXXXXXXXX\"");
-    memcpy(select_user + 47, info->id,15);
+    memcpy(select_user + 47, info->id, 15);
     cout << select_user << endl;
     if (mysql_query(mysql, select_user))
     {
@@ -178,7 +175,7 @@ int NodeMcuServer::get_machine_info(struct machine *info)
     }
     /* 打印当前查询到的记录的数量 */
     cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
-     if ((int)mysql_num_rows(result) == 0)
+    if ((int)mysql_num_rows(result) == 0)
     {
         return -1;
     }
@@ -263,14 +260,15 @@ void NodeMcuServer::init_server()
     this->ACK.Type = ACK_PACKAGE;
 }
 
-void showPackage(struct package pack){
-    cout<<pack.IfM<<endl;
-    cout<<pack.Id<<endl;
-    cout<<(int)pack.Divide<<endl;
-    cout<<(int)pack.Seq<<endl;
-    cout<<(int)pack.Len<<endl;
-    cout<<(int)pack.Type<<endl;
-    cout<<pack.Info<<endl;
+void showPackage(struct package pack)
+{
+    cout << pack.IfM << endl;
+    cout << pack.Id << endl;
+    cout << (int)pack.Divide << endl;
+    cout << (int)pack.Seq << endl;
+    cout << (int)pack.Len << endl;
+    cout << (int)pack.Type << endl;
+    cout << pack.Info << endl;
 }
 
 void NodeMcuServer::MainTask()
@@ -282,7 +280,7 @@ void NodeMcuServer::MainTask()
     char buf[BUFF_LEN];
     while (1)
     {
-        memset(buf,0,sizeof(buf));
+        memset(buf, 0, sizeof(buf));
         struct package temp;
         count = recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr *)&cli, &len);
         if (count == -1)
@@ -290,7 +288,7 @@ void NodeMcuServer::MainTask()
             printf("recieve data fail!\n");
             continue;
         }
-        printf("server recv:length:%d, data: %s\n",count,buf);
+        printf("server recv:length:%d, data: %s\n", count, buf);
         printf("recv from: %s:%d\n", inet_ntoa(cli.sin_addr), cli.sin_port);
         memcpy((char *)&temp, buf, count);
         if (buf[0] == 'N')
@@ -310,29 +308,21 @@ void NodeMcuServer::MainTask()
             }
             else
             {
-                if (now_machine.last_ack != temp.Divide)
-                {
-                    //收到了过时的消息，发送ack什么都不做
-                    this->send_ack(cli, temp);
-                }
-                else
-                {
-                    //收到了新的消息
-                    now_machine.addr_ip = cli.sin_addr.s_addr;
-                    now_machine.addr_port = cli.sin_port;
-                    memcpy(now_machine.id, temp.Id, 15);
-                    now_machine.last_ack = (temp.Divide + 1) % 255;
-                    now_machine.type = SMART_LOCK;
-                    this->save_machince_info(&now_machine, temp); //保存设备最新地址
-                    this->do_package_command(temp);               //应对包命令
-                    this->send_ack(cli, temp);                    //发送ack
-                }
+                //收到了新的消息
+                now_machine.addr_ip = cli.sin_addr.s_addr;
+                now_machine.addr_port = cli.sin_port;
+                memcpy(now_machine.id, temp.Id, 15);
+                now_machine.last_ack = (temp.Divide + 1) % 255;
+                now_machine.type = SMART_LOCK;
+                this->save_machince_info(&now_machine, temp); //保存设备最新地址
+                //this->do_package_command(temp);               //应对包命令
+                this->send_ack(cli, temp); //发送ack
             }
         }
-        else if(buf[0] == 'M')//用来测试
+        else if (buf[0] == 'M') //用来测试
         {
             socklen_t len = sizeof(cli);
-            cout<<"send:"<<sendto(sockfd, buf, count, 0,  (struct sockaddr *)&cli, len)<<endl;
+            cout << "send:" << sendto(sockfd, buf, count, 0, (struct sockaddr *)&cli, len) << endl;
         }
         else
         {
@@ -340,26 +330,24 @@ void NodeMcuServer::MainTask()
             this->react_to_package(buf, count, temp);
             showPackage(temp);
 
-            if(temp.Type==10)//手机验证包
+            if (temp.Type == 10) //手机验证包
             {
                 char userid[20];
-                memcpy(userid,temp.Info,20);
+                memcpy(userid, temp.Info, 20);
                 struct machine info;
-                memcpy(info.id,temp.Info+20,15);
+                memcpy(info.id, temp.Info + 20, 15);
                 int flag = this->get_machine_info(&info);
                 struct sockaddr_in send_machine;
-                send_machine=cli;
-                send_machine.sin_addr.s_addr=info.addr_ip;
-                send_machine.sin_port=info.addr_port;
-                char openthemachine[20]="STHISISSERVERMEG";
-                openthemachine[16]=0;
-                openthemachine[17]=0;
-                openthemachine[18]=20;
-                openthemachine[19]=OPEN_COMMAND;//
-                cout<<"send:"<<sendto(sockfd, openthemachine, 20, 0,  (struct sockaddr *)&send_machine, len)<<endl;
+                send_machine = cli;
+                send_machine.sin_addr.s_addr = info.addr_ip;
+                send_machine.sin_port = info.addr_port;
+                char openthemachine[20] = "STHISISSERVERMEG";
+                openthemachine[16] = 0;
+                openthemachine[17] = 0;
+                openthemachine[18] = 20;
+                openthemachine[19] = OPEN_COMMAND; //
+                cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
             }
-
-            
 
             //app 有哪几个功能啊草
             // 预约功能
@@ -372,15 +360,14 @@ void NodeMcuServer::MainTask()
             //   到时间给服务器回发消息？
             // 2.或者app查询数据库发现到时间了
             //   发送给NodeMcu开门
-            // 
+            //
             // nodemcu进入认证模式，
             // 1.指纹本地认证
             // 2.语音认证
             // 3.app远程认证
-            // 
+            //
             // 草早知道就不写阻塞模式了
-            // 
-            
+            //
         }
     }
     close(sockfd);
