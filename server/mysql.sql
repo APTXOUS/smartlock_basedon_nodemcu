@@ -26,3 +26,11 @@ CREATE TABLE security (
 ) ENGINE=InnoDB DEFAULT CHARSET=gbk;
 
 
+
+Create table Machine_finger (
+  `MF_Machine_id` char(15) NOt NULL,
+  `MF_Machine_finger` char(15) NOt NULL,
+  FOREIGN KEY (`MF_Machine_id`) REFERENCES `Machine_base` (`Machine_id`),
+  FOREIGN KEY (`MF_Machine_finger`) REFERENCES `Machine_base` (`Machine_id`)
+	);
+

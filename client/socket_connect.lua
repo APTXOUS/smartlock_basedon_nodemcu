@@ -18,8 +18,8 @@
 --    char Info[100]; //属性
 --};
 --
-IFfinger=0
-IFsound=0
+Enablesound=0
+Enablefinger=0
 
 -- 之后改成json文件
 ServerIP = "148.70.242.63"
@@ -44,6 +44,53 @@ print(port,ip)
 
 Divide=0;
 
+
+gpio.mode(5,gpio.OUTPUT)
+uart.on("data",3,
+  function(data)
+    print(data)
+    if(Enablesound==1)
+    then
+        if(data == "aaa")
+        then
+            message="aaaa"
+            Divide=1
+            Seq=1
+            Len=24
+            Type=16-- 声音确认包
+            MainInfo1=string.format("N%s%c%c%c%c%s", init_conf["name"],Divide,Seq,Len,Type,message)
+            udpSocket:send(ServerPort, ServerIP, MainInfo1)
+            print("has send sound :",MainInfo1,"\n")
+            Enablesound=0
+        end
+        if(data =="bbb")
+        then 
+            message="bbbb"
+            Divide=1
+            Seq=1
+            Len=24
+            Type=16-- 声音确认包
+            MainInfo1=string.format("N%s%c%c%c%c%s", init_conf["name"],Divide,Seq,Len,Type,message)
+            udpSocket:send(ServerPort, ServerIP, MainInfo1)
+            print("has send sound :",MainInfo1,"\n")
+            Enablesound=0
+        end
+        if(data =="ccc")
+        then 
+            message="cccc"
+            Divide=1
+            Seq=1
+            Len=24
+            Type=16-- 声音确认包
+            MainInfo1=string.format("N%s%c%c%c%c%s", init_conf["name"],Divide,Seq,Len,Type,message)
+            udpSocket:send(ServerPort, ServerIP, MainInfo1)
+            print("has send sound :",MainInfo1,"\n")
+            Enablesound=0
+        end
+    end
+end,0)
+
+
 udpSocket:on("receive", function(s, data, port, ip)
     print(string.format("received '%s' from %s:%d", data, ip, port))
     command_type=string.byte(data, 20,20);
@@ -62,30 +109,44 @@ udpSocket:on("receive", function(s, data, port, ip)
             gpio.write(5, gpio.HIGH)
             print(gpio.read(5),"\n")
         end)
-    elseif(command_type==13)
+    elseif(command_type==13)--告诉nodemcu可以去监听指纹了
     then
-    end
+        Enablefinger=1;
+    elseif(command_type==15)--告诉nodemcu可以去监听声音了
+    then
+        Enablesound=1;
+    end 
     --这里写要干的事情
 end)
 
+tmr.alarm(2, 2000, tmr.ALARM_AUTO, function()
+    if(Enablefinger==1)
+    then
+        gpio.mode(5, gpio.INPUT)
+        print(gpio.read(5),"\n")
+        if(gpio.read(5)==1)
+        then
+            Divide=1
+            Seq=1
+            Len=20
+            Type=14-- 指纹确认包
+            MainInfo1=string.format("N%s%c%c%c%c", init_conf["name"],Divide,Seq,Len,Type)
+            udpSocket:send(ServerPort, ServerIP, MainInfo1)
+            print("has send finger :",MainInfo1,"\n")
+            Enablefinger=0
+        end
+    end
+end)
 
 tmr.alarm(0, 3000, tmr.ALARM_AUTO, function() --每3秒发送一次数据
-    if(IFfinger~=0)--当IFfinger为高电平时
-    then
-
-    elseif(IFsound~=0)-- 当sound有信号时
-    then
-        
-    else
-        --心跳包
-        Divide=1
-        Seq=1
-        Len=20
-        Type=15-- AWAKE_COMMAND
-        MainInfo1=string.format("N%s%c%c%c%c", init_conf["name"],Divide,Seq,Len,Type)
-        udpSocket:send(ServerPort, ServerIP, MainInfo1)
-        print("has send:",MainInfo1,"\n")
-    end
+    --心跳包
+    Divide=1
+    Seq=1
+    Len=20
+    Type=15-- AWAKE_COMMAND
+    MainInfo1=string.format("N%s%c%c%c%c", init_conf["name"],Divide,Seq,Len,Type)
+    udpSocket:send(ServerPort, ServerIP, MainInfo1)
+    print("has send:",MainInfo1,"\n")
 end)
 
 print("end")

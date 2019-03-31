@@ -41,6 +41,19 @@
         exit;
     }else if($identity=="指纹验证")
     {
+        $host = '127.0.0.1';
+        $port = '1234';
+
+        $uid_len=strlen($userid);
+
+        $Divide=0;
+        $Seq=0;
+        $Len=35+20;
+        $Type=13;//13为指纹验证
+        $message="ATHISISTHEWEBAPP";
+        $package=sprintf("%s%c%c%c%c%20s%15s",$message,$Divide,$Seq,$Len,$Type,$userid,$machineid); 
+        //echo $package;
+        send_udp_message($host, $port, $package);
         header("refresh:0;url=../php/homepage.php");//如果成功跳转至homepage.html页面
         exit;
     }

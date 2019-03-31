@@ -23,7 +23,11 @@ const int BUFF_LEN = 200;
 #define PACKAGE_MIN 20
 
 #define OPEN_COMMAND 12 //开锁
+#define LOCK_COMMAND 13 //
+#define LOCK_COMFIRM 14 //
 
+#define SOUND_COMMAND 15 //
+#define SOUND_CONFIRM 16
 struct package
 {
     char IfM;       //是客户端还是app
@@ -57,6 +61,10 @@ class NodeMcuServer
     int get_machine_info(struct machine *info, struct package pack);
     int add_machine_info(struct machine *info, struct package pack);
     int get_machine_info(struct machine *info);
+    int get_machine_finger_machine(struct machine *info,struct machine *finger);
+    int get_finger_machine_finger(struct machine *finger,struct machine *info);
+    int get_sound_machine_sound(struct machine *sound,struct machine *info);
+    int get_machine_sound_machine(struct machine *info,struct machine *sound);
     void print(const char *info)
     {
         printf(info);
@@ -193,6 +201,144 @@ int NodeMcuServer::get_machine_info(struct machine *info)
     return 0;
 }
 
+int NodeMcuServer::get_sound_machine_sound(struct machine *sound,struct machine *info)
+{
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    char select_user[255];
+    sprintf(select_user, "select * from Machine_sound where MS_Machine_sound = \"XXXXXXXXXXXXXXX\"");
+    memcpy(select_user + 54, sound->id, 15);
+    cout << select_user << endl;
+    if (mysql_query(mysql, select_user))
+    {
+        cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+        return (-1);
+    }
+     if ((result = mysql_store_result(mysql)) == NULL)
+    {
+        cout << "mysql_store_result failed" << endl;
+        return (-1);
+    }
+    /* 打印当前查询到的记录的数量 */
+    cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
+    if ((int)mysql_num_rows(result) == 0)
+    {
+        return -1;
+    }
+    else
+    {
+        row = mysql_fetch_row(result);
+        memcpy(info->id, row[0], 15);
+        get_machine_info(info);
+    }
+    /* 释放result */
+    mysql_free_result(result);
+    return 0;
+}
+int NodeMcuServer::get_finger_machine_finger(struct machine *finger,struct machine *info)
+{
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    char select_user[255];
+    sprintf(select_user, "select * from Machine_finger where MF_Machine_finger = \"XXXXXXXXXXXXXXX\"");
+    memcpy(select_user + 56, finger->id, 15);
+    cout << select_user << endl;
+    if (mysql_query(mysql, select_user))
+    {
+        cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+        return (-1);
+    }
+     if ((result = mysql_store_result(mysql)) == NULL)
+    {
+        cout << "mysql_store_result failed" << endl;
+        return (-1);
+    }
+    /* 打印当前查询到的记录的数量 */
+    cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
+    if ((int)mysql_num_rows(result) == 0)
+    {
+        return -1;
+    }
+    else
+    {
+        row = mysql_fetch_row(result);
+        memcpy(info->id, row[0], 15);
+        get_machine_info(info);
+    }
+    /* 释放result */
+    mysql_free_result(result);
+    return 0;
+}
+int NodeMcuServer::get_machine_sound_machine(struct machine *info,struct machine *sound)
+{
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    char select_user[255];
+    sprintf(select_user, "select * from Machine_sound where MS_Machine_id = \"XXXXXXXXXXXXXXX\"");
+    memcpy(select_user + 51, info->id, 15);
+    cout << select_user << endl;
+    if (mysql_query(mysql, select_user))
+    {
+        cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+        return (-1);
+    }
+     if ((result = mysql_store_result(mysql)) == NULL)
+    {
+        cout << "mysql_store_result failed" << endl;
+        return (-1);
+    }
+    /* 打印当前查询到的记录的数量 */
+    cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
+    if ((int)mysql_num_rows(result) == 0)
+    {
+        return -1;
+    }
+    else
+    {
+        row = mysql_fetch_row(result);
+        memcpy(sound->id, row[1], 15);
+        get_machine_info(sound);
+    }
+    /* 释放result */
+    mysql_free_result(result);
+    return 0;
+}
+
+int NodeMcuServer::get_machine_finger_machine(struct machine *info,struct machine *finger)
+{
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    char select_user[255];
+    sprintf(select_user, "select * from Machine_finger where MF_Machine_id = \"XXXXXXXXXXXXXXX\"");
+    memcpy(select_user + 52, info->id, 15);
+    cout << select_user << endl;
+    if (mysql_query(mysql, select_user))
+    {
+        cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+        return (-1);
+    }
+     if ((result = mysql_store_result(mysql)) == NULL)
+    {
+        cout << "mysql_store_result failed" << endl;
+        return (-1);
+    }
+    /* 打印当前查询到的记录的数量 */
+    cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
+    if ((int)mysql_num_rows(result) == 0)
+    {
+        return -1;
+    }
+    else
+    {
+        row = mysql_fetch_row(result);
+        memcpy(finger->id, row[1], 15);
+        get_machine_info(finger);
+    }
+    /* 释放result */
+    mysql_free_result(result);
+    return 0;
+}
+
 int NodeMcuServer::save_machince_info(struct machine *info, struct package pack)
 {
     char select_user[255];
@@ -315,6 +461,36 @@ void NodeMcuServer::MainTask()
                 now_machine.last_ack = (temp.Divide + 1) % 255;
                 now_machine.type = SMART_LOCK;
                 this->save_machince_info(&now_machine, temp); //保存设备最新地址
+                if(temp.Type == 14)
+                {
+                    struct machine info;
+                    int flag = this->get_finger_machine_finger(&now_machine,&info);
+                    struct sockaddr_in send_machine;
+                    send_machine = cli;
+                    send_machine.sin_addr.s_addr = info.addr_ip;
+                    send_machine.sin_port = info.addr_port;
+                    char openthemachine[20] = "STHISISSERVERMEG";
+                    openthemachine[16] = 0;
+                    openthemachine[17] = 0;
+                    openthemachine[18] = 20;
+                    openthemachine[19] = OPEN_COMMAND; //
+                    cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
+                }
+                 if(temp.Type == 16)
+                {
+                    struct machine info;
+                    int flag = this->get_sound_machine_sound(&now_machine,&info);
+                    struct sockaddr_in send_machine;
+                    send_machine = cli;
+                    send_machine.sin_addr.s_addr = info.addr_ip;
+                    send_machine.sin_port = info.addr_port;
+                    char openthemachine[20] = "STHISISSERVERMEG";
+                    openthemachine[16] = 0;
+                    openthemachine[17] = 0;
+                    openthemachine[18] = 20;
+                    openthemachine[19] = OPEN_COMMAND; //
+                    cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
+                }
                 //this->do_package_command(temp);               //应对包命令
                 this->send_ack(cli, temp); //发送ack
             }
@@ -349,6 +525,45 @@ void NodeMcuServer::MainTask()
                 cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
             }
 
+            if (temp.Type == 13) //手机验证包
+            {
+                char userid[20];
+                memcpy(userid, temp.Info, 20);
+                struct machine info;
+                memcpy(info.id, temp.Info + 20, 15);
+                struct machine finger;
+                int flag = get_machine_finger_machine(&info,&finger);
+
+                struct sockaddr_in send_machine;
+                send_machine = cli;
+                send_machine.sin_addr.s_addr = finger.addr_ip;
+                send_machine.sin_port = finger.addr_port;
+                char openthemachine[20] = "STHISISSERVERMEG";
+                openthemachine[16] = 0;
+                openthemachine[17] = 0;
+                openthemachine[18] = 20;
+                openthemachine[19] = LOCK_COMMAND; //
+                cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
+            }
+            if (temp.Type == 15) //声音验证包
+            {
+                char userid[20];
+                memcpy(userid, temp.Info, 20);
+                struct machine info;
+                memcpy(info.id, temp.Info + 20, 15);
+                struct machine sound;
+                int flag = get_machine_sound_machine(&info,&sound);
+                struct sockaddr_in send_machine;
+                send_machine = cli;
+                send_machine.sin_addr.s_addr = sound.addr_ip;
+                send_machine.sin_port = sound.addr_port;
+                char openthemachine[20] = "STHISISSERVERMEG";
+                openthemachine[16] = 0;
+                openthemachine[17] = 0;
+                openthemachine[18] = 20;
+                openthemachine[19] = SOUND_COMMAND; //
+                cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
+            }
             //app 有哪几个功能啊草
             // 预约功能
             // 先预约时段
