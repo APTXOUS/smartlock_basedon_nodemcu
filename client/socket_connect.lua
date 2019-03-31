@@ -51,33 +51,10 @@ uart.on("data",3,
     print(data)
     if(Enablesound==1)
     then
-        if(data == "aaa")
+        print(soundinfo)
+        if(data == soundinfo)
         then
-            message="aaaa"
-            Divide=1
-            Seq=1
-            Len=24
-            Type=16-- 声音确认包
-            MainInfo1=string.format("N%s%c%c%c%c%s", init_conf["name"],Divide,Seq,Len,Type,message)
-            udpSocket:send(ServerPort, ServerIP, MainInfo1)
-            print("has send sound :",MainInfo1,"\n")
-            Enablesound=0
-        end
-        if(data =="bbb")
-        then 
-            message="bbbb"
-            Divide=1
-            Seq=1
-            Len=24
-            Type=16-- 声音确认包
-            MainInfo1=string.format("N%s%c%c%c%c%s", init_conf["name"],Divide,Seq,Len,Type,message)
-            udpSocket:send(ServerPort, ServerIP, MainInfo1)
-            print("has send sound :",MainInfo1,"\n")
-            Enablesound=0
-        end
-        if(data =="ccc")
-        then 
-            message="cccc"
+            message=data
             Divide=1
             Seq=1
             Len=24
@@ -115,6 +92,8 @@ udpSocket:on("receive", function(s, data, port, ip)
     elseif(command_type==15)--告诉nodemcu可以去监听声音了
     then
         Enablesound=1;
+        soundinfo=string.sub(data, 21,23);
+        print("start to listen")
     end 
     --这里写要干的事情
 end)

@@ -34,3 +34,11 @@ Create table Machine_finger (
   FOREIGN KEY (`MF_Machine_finger`) REFERENCES `Machine_base` (`Machine_id`)
 	);
 
+
+Create table Machine_sound (
+  `MS_Machine_id` char(15) NOt NULL,
+  `MS_Machine_sound` char(15) NOt NULL,
+  FOREIGN KEY (`MS_Machine_id`) REFERENCES `Machine_base` (`Machine_id`),
+  FOREIGN KEY (`MS_Machine_sound`) REFERENCES `Machine_base` (`Machine_id`)
+	);
+

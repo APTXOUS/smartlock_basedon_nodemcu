@@ -489,7 +489,9 @@ void NodeMcuServer::MainTask()
                     openthemachine[17] = 0;
                     openthemachine[18] = 20;
                     openthemachine[19] = OPEN_COMMAND; //
+                    cout<<"----------------------------------------"<<endl;
                     cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
+                    cout << info.id<<endl;
                 }
                 //this->do_package_command(temp);               //应对包命令
                 this->send_ack(cli, temp); //发送ack
@@ -557,12 +559,13 @@ void NodeMcuServer::MainTask()
                 send_machine = cli;
                 send_machine.sin_addr.s_addr = sound.addr_ip;
                 send_machine.sin_port = sound.addr_port;
-                char openthemachine[20] = "STHISISSERVERMEG";
+                char openthemachine[23] = "STHISISSERVERMEG";
                 openthemachine[16] = 0;
                 openthemachine[17] = 0;
                 openthemachine[18] = 20;
                 openthemachine[19] = SOUND_COMMAND; //
-                cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
+                memcpy(openthemachine+20,"bbb",3);
+                cout << "send:" << sendto(sockfd, openthemachine, 23, 0, (struct sockaddr *)&send_machine, len) << endl;
             }
             //app 有哪几个功能啊草
             // 预约功能
