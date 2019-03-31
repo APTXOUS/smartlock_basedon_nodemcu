@@ -48,7 +48,7 @@
         $Type=15;//13为指纹验证
         $message="ATHISISTHEWEBAPP";
         $package=sprintf("%s%c%c%c%c%20s%15s",$message,$Divide,$Seq,$Len,$Type,$userid,$machineid); 
-
+        send_udp_message($host, $port, $package);
         echo "请说：播放音乐";
         echo "
             <script>

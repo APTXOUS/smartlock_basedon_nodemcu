@@ -903,3 +903,69 @@
   <thread>14</thread>
   <message>Open port COM10 - Success.</message>
 </record>
+<record>
+  <date>2019-03-31T20:53:57</date>
+  <millis>1554036837322</millis>
+  <sequence>88</sequence>
+  <logger>ESPlorer.ESPlorer</logger>
+  <level>INFO</level>
+  <class>ESPlorer.ESPlorer</class>
+  <method>log</method>
+  <thread>14</thread>
+  <message>jssc.SerialPortException: Port name - COM10; Method name - setEventsMask(); Exception type - Can't set mask.</message>
+</record>
+<record>
+  <date>2019-03-31T20:53:57</date>
+  <millis>1554036837325</millis>
+  <sequence>89</sequence>
+  <logger>ESPlorer.ESPlorer</logger>
+  <level>INFO</level>
+  <class>ESPlorer.ESPlorer</class>
+  <method>log</method>
+  <thread>14</thread>
+  <message>Close port COM10 - unknown error.</message>
+</record>
+<record>
+  <date>2019-03-31T20:53:57</date>
+  <millis>1554036837712</millis>
+  <sequence>90</sequence>
+  <logger>ESPlorer.ESPlorer</logger>
+  <level>INFO</level>
+  <class>ESPlorer.ESPlorer</class>
+  <method>log</method>
+  <thread>14</thread>
+  <message>Serial port COM10 save as default.</message>
+</record>
+<record>
+  <date>2019-03-31T20:53:57</date>
+  <millis>1554036837715</millis>
+  <sequence>91</sequence>
+  <logger>ESPlorer.ESPlorer</logger>
+  <level>INFO</level>
+  <class>ESPlorer.ESPlorer</class>
+  <method>log</method>
+  <thread>14</thread>
+  <message>Baud rate 115200 save as default.</message>
+</record>
+<record>
+  <date>2019-03-31T20:53:57</date>
+  <millis>1554036837717</millis>
+  <sequence>92</sequence>
+  <logger>ESPlorer.ESPlorer</logger>
+  <level>INFO</level>
+  <class>ESPlorer.ESPlorer</class>
+  <method>log</method>
+  <thread>14</thread>
+  <message>Try to open port COM10, baud 115200, 8N1</message>
+</record>
+<record>
+  <date>2019-03-31T20:53:57</date>
+  <millis>1554036837726</millis>
+  <sequence>93</sequence>
+  <logger>ESPlorer.ESPlorer</logger>
+  <level>INFO</level>
+  <class>ESPlorer.ESPlorer</class>
+  <method>log</method>
+  <thread>14</thread>
+  <message>Open port COM10 - Success.</message>
+</record>
