@@ -1,0 +1,312 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>交互门锁</title>
+    <!-- Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <style>
+        /*web background*/
+        .container {
+            display: table;
+            height: 100%;
+        }
+
+
+        /* centered columns styles */
+        .row-centered {}
+
+        .col-centered {
+            display: inline-block;
+            float: none;
+            text-align: left;
+            margin-right: 100px;
+        }
+
+        .lazyload-img {
+            display: block;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .lazyload-img>i {
+            position: relative;
+            display: block;
+            width: 100%;
+            padding-top: 60%;
+            background: #ccc no-repeat center center;
+        }
+
+        .lazyload-img>i>img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            will-change: transform;
+        }
+
+        .fakeimg {
+            height: 400px;
+            background: #aaa;
+        }
+    </style>
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<!--相应式导航栏-->
+
+<body>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../php/homepage.php">Dashboard 控制台 <?php OutputTitle(); ?></a>
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <div class="container-fluid">
+        <div class="row row-centered">
+            <div class="col-sm-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">门锁摄像头</h3>
+                    </div>
+                    <div class="panel-body">
+                        <button type="submit" class="btn btn-lg btn-warning" onclick="opencamera()">
+                            打开摄像头
+                        </button>
+                        <button type="submit" class="btn btn-lg btn-default" onclick="closecamera()">
+                            关闭摄像头
+                        </button>
+                        <div class="fakeimg">
+                            <img id="imgs" name="imgs" src="/images/1.jpg" width="100%" height="100%" />
+                        </div>
+                        <p id="url"></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row row-centered">
+            <div class="col-sm-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">操作</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="nav nav-pills nav-stacked">
+                            <button type="submit" class="btn btn-lg btn-primary">
+                                刷新
+                            </button>
+                            <button type="submit" class="btn btn-lg btn-warning" onclick="openmachine()">
+                                同意开门
+                            </button>
+                            <button type="submit" class="btn btn-lg btn-default" onclick="letsleep()">
+                                拒绝开门
+                            </button>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row row-centered">
+            <div class="col-sm-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">语音认证</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="nav nav-pills nav-stacked">
+                            <button type="submit" class="btn btn-lg btn-warning" data-toggle="modal"
+                            data-target="#myModal2" >
+                                语音认证
+                            </button>
+                            <button type="submit" class="btn btn-lg btn-default" data-toggle="modal"
+                                data-target="#myModal" >
+                                发送消息
+                            </button>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">发送消息</h4>
+                </div>
+                <div class="modal-body">
+                    发送消息
+                    <input id="words" ,type="text" name="words" class="form-control"
+                        placeholder="您可以发送文字给门锁，门锁会自动文字转语音">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="sendmessage()">提交更改</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">语音认证</h4>
+                    </div>
+                    <div class="modal-body">
+                        发送口令
+                        <input id="voicekey" type="text" name="keyenter" list="keylist"class="form-control" placeholder="请选择语音口令">
+                        <datalist id="keylist">
+                        <option>1芝麻开门</option>
+                        <option>2开门</option>
+                        <option>3开锁</option>
+                        <option>4自定义</option>
+                        <option>5全部</option>
+                        </datalist>         
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" onclick="sendvoicekey()">发送密钥</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</body>
+<script type="text/javascript">
+    function auto_tab_div() {
+        var start = new Date().getTime();
+        $.ajax({
+            type: "POST",
+            url: "../php/getimg.php",
+            data: {
+                command: "getimg"// 注意不要在此行增加逗号
+            },
+            dataType: "json",
+            success: function (msg) {
+                var nv = document.getElementById("url");
+                var lag = new Date().getTime() - start;
+
+                nv.innerHTML = msg[0].save_location + " " + String(lag) + "ms";
+
+                document.getElementById("imgs").src = msg[0].save_location;
+            }
+        });
+    }
+    function opencamera() {
+        $.ajax({
+            type: "POST",
+            url: "../php/getimg.php",
+            data: {
+                command: "camerawake"// 注意不要在此行增加逗号
+            },
+            dataType: "json",
+            success: function (msg) {
+                console.log(msg);
+            }
+        });
+    }
+
+    function closecamera() {
+        $.ajax({
+            type: "POST",
+            url: "../php/getimg.php",
+            data: {
+                command: "camerasleep"// 注意不要在此行增加逗号
+            },
+            dataType: "json",
+            success: function (msg) {
+                console.log(msg);
+            }
+        });
+    }
+    function sendvoicekey()
+    {
+        var input = document.getElementById("voicekey");
+        $.ajax({
+            type: "POST",
+            url: "../php/getimg.php",
+            data: {
+                command: "sendvoicekey",// 注意不要在此行增加逗号
+                data: input.value
+            },
+            dataType: "json",
+            success: function (msg) {
+                console.log(msg);
+                alert(input.value + "已发送");
+            }
+        });
+    }
+    function letsleep() {
+        console.log("????");
+        $.ajax({
+            type: "POST",
+            url: "../php/getimg.php",
+            data: {
+                command: "besleep"// 注意不要在此行增加逗号
+            },
+            dataType: "json",
+            success: function (msg) {
+                console.log(msg);
+                self.location = "../php/homepage.php";
+            }
+        });
+    }
+    function sendmessage() {
+        var input = document.getElementById("words");
+        $.ajax({
+            type: "POST",
+            url: "../php/getimg.php",
+            data: {
+                command: "sendmessage",// 注意不要在此行增加逗号
+                data: input.value
+            },
+            dataType: "json",
+            success: function (msg) {
+                console.log(msg);
+                alert(msg+ "已发送");
+            }
+        });
+
+    }
+    function openmachine() {
+        $.ajax({
+            type: "POST",
+            url: "../php/getimg.php",
+            data: {
+                command: "openthedoor"// 注意不要在此行增加逗号
+            },
+            dataType: "json",
+            success: function (msg) {
+                console.log(msg);
+                alert("已打开您的房门，10秒后自动关闭");
+            }
+        });
+    }
+    setInterval("auto_tab_div()", 2000);
+</script>
+
+</html>

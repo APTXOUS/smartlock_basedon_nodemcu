@@ -1,0 +1,48 @@
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript" src="/plugin/jquery-easyui-1.4.3/jquery.min.js"></script>
+</head>
+
+<body style="background-color: pink">
+    <div id="carousel" style="border:1px solid #000000; float:left; width:400px;">
+        <div id="tabpic">
+            <div style="display:block;"><img src="/images/1.jpg" width="400px" height="400px" /></div>
+            <div style="display:none;"><img src="/images/2.jpg" width="400px" /></div>
+            <div style="display:none;"><img src="/images/3.jpg" width="400px" /></div>
+            <div style="display:none;"><img src="/images/4.jpg" width="400px" /></div>
+        </div>
+        <div style="float:right;">
+            <a href="javascript:void(0)" name="tablink" οnclick="div_tab(0)" style="color:#ff0000;">1</a>
+            <a href="javascript:void(0)" name="tablink" οnclick="div_tab(1)" style="color:#0000ff;">2</a>
+            <a href="javascript:void(0)" name="tablink" οnclick="div_tab(2)" style="color:#0000ff;">3</a>
+            <a href="javascript:void(0)" name="tablink" οnclick="div_tab(3)" style="color:#0000ff;">4</a>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    function div_tab(tabName) {
+        var tabLinkArr = document.getElementsByName("tablink");
+        var tabPicArr = document.getElementById("tabpic").getElementsByTagName("div");
+        for (var i = 0; i < tabLinkArr.length; i++) {
+            if (i == tabName) {
+                tabLinkArr[i].style.color = "#ff0000";
+                tabPicArr[i].style.display = "block";
+            } else {
+                tabLinkArr[i].style.color = "#0000ff";
+                tabPicArr[i].style.display = "none";
+            }
+        }
+    }
+    var i = 0;
+    function auto_tab_div() {
+        //如果切換到最後一張圖片則重新從第一張開始
+        if (i > 3) {
+            i = 0;
+        }
+        //每兩秒自動讀取下一張圖片
+        div_tab(i);
+        i++;
+    }
+    setInterval("auto_tab_div()", 1000);
+</script>

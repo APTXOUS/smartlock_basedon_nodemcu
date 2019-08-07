@@ -17,12 +17,13 @@
 --    char Type;      //包类型
 --    char Info[100]; //属性
 --};
---
 Enablesound=0
 Enablefinger=0
+Enablelight=1
+
 
 -- 之后改成json文件
-ServerIP = "148.70.242.63"
+ServerIP = "119.28.139.244"
 ServerPort = 1234
 
 
@@ -94,6 +95,12 @@ udpSocket:on("receive", function(s, data, port, ip)
         Enablesound=1;
         soundinfo=string.sub(data, 21,23);
         print("start to listen")
+    elseif(command_type==22)--告诉nodemcu停止监听红外线
+    then
+        Enablelight=0;
+    elseif(command_type==21)--告诉nodemcu可以去监听红外线了
+    then
+        Enablelight=1;
     end 
     --这里写要干的事情
 end)
@@ -102,7 +109,7 @@ tmr.alarm(2, 2000, tmr.ALARM_AUTO, function()
     if(Enablefinger==1)
     then
         gpio.mode(5, gpio.INPUT)
-        print(gpio.read(5),"\n")
+        print("5:",gpio.read(5),"\n")
         if(gpio.read(5)==1)
         then
             Divide=1
@@ -116,6 +123,26 @@ tmr.alarm(2, 2000, tmr.ALARM_AUTO, function()
         end
     end
 end)
+
+tmr.alarm(3, 1000, tmr.ALARM_AUTO, function()
+    if(Enablelight==1)
+    then
+        gpio.mode(6, gpio.INPUT)
+        print("6:",gpio.read(6),"\n")
+        if(gpio.read(6)==1)
+        then
+            Divide=1
+            Seq=1
+            Len=20
+            Type=17-- 红外线确认包
+            MainInfo1=string.format("N%s%c%c%c%c", init_conf["name"],Divide,Seq,Len,Type)
+            udpSocket:send(ServerPort, ServerIP, MainInfo1)
+            print("has send light :",MainInfo1,"\n")
+        end
+    end
+end)
+
+
 
 tmr.alarm(0, 3000, tmr.ALARM_AUTO, function() --每3秒发送一次数据
     --心跳包

@@ -15,17 +15,17 @@
     if($row["count(*)"]==1)
     {
         $_SESSION["uid"] = $userName;
-        header("refresh:0;url=../php/homepage.php");//Èç¹û³É¹¦Ìø×ªÖÁhomepage.htmlÒ³Ãæ
+        header("refresh:0;url=../php/homepage.php");//ï¿½ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½×ªï¿½ï¿½homepage.htmlÒ³ï¿½ï¿½
         exit;
     }
     else
     {
-        echo "ÓÃ»§Ãû»òÃÜÂë´íÎó";
+        echo "ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
         echo "
             <script>
                     setTimeout(function(){window.location.href='../html/login.html';},1000);
             </script>
-        ";//Èç¹û´íÎóÊ¹ÓÃjs 1ÃëºóÌø×ªµ½µÇÂ¼Ò³ÃæÖØÊÔ;
+        ";//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½js 1ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Â¼Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½;
     }
     $mysqli->close();
 ?>

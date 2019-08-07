@@ -3,10 +3,10 @@
         $hosthome = 'localhost';
         $database = 'NodeMcu';
         $userName = 'root';
-        $password = 'yyy19980425';
+        $password = '114514';
         $mysqli = new mysqli($hosthome, $userName, $password,$database);
         if (mysqli_connect_errno()){
-            echo "连接失败，原因为：".mysqli_connect_error();
+            echo "error锟斤拷".mysqli_connect_error();
             exit();
             }
         $result = $mysqli->query ("set names gbk");
@@ -28,5 +28,13 @@
         {
             return $strText;
         }
+    }
+    function check_var( $var, $default = ''){
+        return( (isset($var) and !empty($var )) ? $var : (!empty($default) ? $default : false) );
+        
+    }
+
+    function alert($msg) {
+        echo "<script type='text/javascript'>alert('$msg');</script>";
     }
 ?>

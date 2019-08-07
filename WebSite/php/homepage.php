@@ -32,9 +32,11 @@ function OutputModal($Machineid){
                  '.$Machineid.'预约界面
                 </h4>
             </div>
+            <form action="../php/use_Machine.php" method="POST">
             <div class="modal-body">
-                <form>
-                预约时间：<input type="text" list="timelist"class="form-control">
+                机器:
+                <input type="text" name="machineid" class="form-control" value="'.$Machineid.'" readonly="readonly">
+                预约时间：<input type="text"  name="timerange" list="timelist"class="form-control">
                 <datalist id="timelist">';
     for ($i=0; $i<=23; $i++)
     {
@@ -45,15 +47,16 @@ function OutputModal($Machineid){
         echo ':00'."</option>";
     }
     echo            '</datalist>         
-                </form>
+              
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                 </button>
-                <button type="button" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary">
                     提交更改
                 </button>
             </div>
+            </form>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
 </div>';
@@ -105,17 +108,85 @@ function OutputMachine($Machname){
                               data-toggle="dropdown">
                               更多 <span class="caret"></span></button>
                           <ul class="dropdown-menu " role="menu">
-                              <li><a href="#">Tablet</a></li>
-                              <li><a href="#">Smartphone</a></li>
+                              <li><a href="#"data-toggle="modal" data-target="#'.$Machname."His".'">预约记录</a></li>
+                              <li><a href="#">more</a></li>
                           </ul>
                       </div>
                   </div>'
                   .OutputModal($Machname)
-                  .OutputUse($Machname).
+                  .OutputUse($Machname)
+                  .OutputHis($Machname).
               '</div>
           </div>
       </div>
   </div>
+</div>';
+}
+
+function OutputHis($Machineid)
+{
+    
+    $mysqli=getConnect();
+    $loginSQL = "select count(*) from Servicelist where Machine_id= '$Machineid'";
+    $result = $mysqli->query($loginSQL);
+    $row=$result->fetch_assoc();
+    if($row["count(*)"]==0)
+    {
+        for ($i=0; $i<=23; $i++)
+        {
+            $j= $i+1;
+            $SQL="INSERT INTO Servicelist VALUES ('$Machineid','$i:00-$j:00','Not used')";
+            $result = $mysqli->query($SQL);
+        }
+    }
+
+    echo '<div class="modal fade" id="'.$Machineid."His".'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                 '.$Machineid.'预约记录
+                </h4>
+            </div>
+            <form action="../php/use_Machine.php" method="POST">
+                <div class="modal-body"> 
+                    机器:
+                    <input type="text" name="machineid" class="form-control" value="'.$Machineid.'" readonly="readonly">
+                    预约记录';
+
+    echo  '<table class="table table-striped">';
+    echo '<thead>
+    <tr>
+      <th>时间</th>
+      <th>状态</th>
+    </tr>
+    </thead>';
+
+    echo '<tbody>';
+
+    $machineselect="select * from Servicelist where Machine_id ='$Machineid'";
+    $result = $mysqli->query($machineselect);
+    while($row=$result->fetch_assoc()){
+        echo  ' <tr>
+        <td>'.$row['Machine_time'].'</td>
+        <td>'.$row['Machine_used'].'</td>
+      </tr>';
+    }
+    echo '</tbody>';
+    echo  '</table>';
+
+
+    echo'        </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
 </div>';
 }
 
@@ -136,6 +207,8 @@ function OutputUse($Machineid)
                 <div class="modal-body"> 
                     机器:
                     <input type="text" name="machineid" class="form-control" value="'.$Machineid.'" readonly="readonly">
+                    预约密钥:
+                    <input type="text" name="servicepwd" class="form-control" placeholder="请填写预约密钥，若没有密钥，则留空">
                     选择你要使用的验证方式:
                     <input type="text" name="identity" list="securitylist"class="form-control">
                     <datalist id="securitylist">
@@ -164,6 +237,120 @@ function OutputAllMachine()
     while($row=$result->fetch_assoc()){
         OutputMachine(iconv('GB2312', 'UTF-8', $row["Machine_id"]));
     }
+    $result->close();
+    $mysqli->close();
+}
+
+function OutputStm($row)
+{
+    echo '<div class=" col-sm-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                '.$row["stm_name"].'
+            </h3>
+        </div>
+        <div class="panel-body">
+          <div container>
+              <div class="col-sm-3 col-xs-3">
+                  <img src="../img/nodemcu.png" class="img-responsive " style="float:left;">
+              </div>
+              <div class="col-sm-3 col-xs-3">
+              <a href="'.$row["stm_page"].'"><input class="btn btn-primary" type="button" name="test" value="使用"/></a>
+              </div>
+          </div>
+      </div>
+    </div> 
+    </div>';
+}
+
+function OutputStm32()
+{
+    $mysqli=getConnect();
+    $machineselect="select * from STM32_base";
+    $result = $mysqli->query($machineselect);
+    while($row=$result->fetch_assoc()){
+        OutputStm($row);
+    }
+    $result->close();
+    $mysqli->close();
+}
+
+
+function OutputMyservice()
+{
+    echo '<div class=" col-sm-12">';
+    echo '<div class="panel panel-default">
+    <div class="panel-heading">
+    <h3 class="panel-title">
+        预约记录
+    </h3>
+    </div>';
+    echo  '<table class="table table-striped">';
+    echo '<thead>
+    <tr>
+      <th>机器</th>
+      <th>时段</th>
+      <th>密码</th>
+    </tr>
+    </thead>';
+
+    echo '<tbody>';
+    $userName=$_SESSION["uid"];
+    $mysqli=getConnect();
+    $machineselect="select * from UserService where uid='$userName'";
+    $result = $mysqli->query($machineselect);
+    while($row=$result->fetch_assoc()){
+        echo  ' <tr>
+        <td>'.$row['Machine_id'].'</td>
+        <td>'.$row['Machine_time'].'</td>
+        <td>'.$row['ServicePwd'].'</td>
+       </button>'.'</td>
+      </tr>';
+    }
+    echo '</tbody>';
+    echo  '</table></div></div>';
+
+    $result->close();
+    $mysqli->close();
+}
+
+
+function OutputHistory()
+{
+    echo '<div class=" col-sm-12">';
+    echo '<div class="panel panel-default">
+    <div class="panel-heading">
+    <h3 class="panel-title">
+        历史记录
+    </h3>
+    </div>';
+    echo  '<table class="table table-striped">';
+    echo '<thead>
+    <tr>
+      <th>用户</th>
+      <th>操作</th>
+      <th>机器</th>
+      <th>时间</th>
+    </tr>
+    </thead>';
+
+    echo '<tbody>';
+
+    $mysqli=getConnect();
+    $machineselect="select * from History ORDER BY his_time DESC";
+    $result = $mysqli->query($machineselect);
+    while($row=$result->fetch_assoc()){
+        echo  ' <tr>
+        <td>'.$row['his_user'].'</td>
+        <td>'.iconv('GB2312', 'UTF-8',$row['his_oper']).'</td>
+        <td>'.$row['his_mach'].'</td>
+        <td>'.$row['his_time'].'</td>
+      </tr>';
+    }
+    echo '</tbody>';
+    echo  '</table></div></div>';
+
     $result->close();
     $mysqli->close();
 }
@@ -203,16 +390,18 @@ function OutputAllMachine()
                 <ul id="myTab" class="nav navbar-nav">
                     <li class="active">
                         <a href="#home"  data-toggle="tab">
-                            我的机器
+                            NodeMcu设备
                         </a>
                     </li>
-                    <li><a href="#ios"data-toggle="tab">全部机器</a></li>
+                    <li><a href="#ios"data-toggle="tab">onenet设备</a></li>
+                    <li><a href="#history"data-toggle="tab">使用记录</a></li>
+                    <li><a href="#service"data-toggle="tab">我的预约</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             更多 <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">正在使用</a></li>
+                            <li><a href="#">帮助</a></li>
                             <li class="divider"></li>
                             <li><a href="#">设置</a></li>
                             <li class="divider"></li>
@@ -232,19 +421,57 @@ function OutputAllMachine()
             
         </div>
         <div class="tab-pane fade" id="ios">
-            <p>iOS 是一个由苹果公司开发和发布的手机操作系统。最初是于 2007 年首次发布 iPhone、iPod Touch 和 Apple 
-                TV。iOS 派生自 OS X，它们共享 Darwin 基础。OS X 操作系统是用在苹果电脑上，iOS 是苹果的移动版本。</p>
+            <div class="container-fluid">
+                <?php OutputStm32(); ?>
+            </div>	
         </div>
-        <div class="tab-pane fade" id="jmeter">
-            <p>jMeter 是一款开源的测试软件。它是 100% 纯 Java 应用程序，用于负载和性能测试。</p>
+        <div class="tab-pane fade" id="history">
+            <div class="container-fluid">
+                <?php OutputHistory(); ?>
+            </div>	
         </div>
-        <div class="tab-pane fade" id="ejb">
-            <p>Enterprise Java Beans（EJB）是一个创建高度可扩展性和强大企业级应用程序的开发架构，部署在兼容应用程序服务器（比如 JBOSS、Web Logic 等）的 J2EE 上。
-            </p>
+        <div class="tab-pane fade" id="service">
+            <div class="container-fluid">
+                <?php OutputMyservice(); ?>
+            </div>	
         </div>
     </div>
 
 
+
+</div>
+
+
 </body>
 
+
+
+<script type="text/javascript">
+   function auto_tab_div(){
+    var start = new Date().getTime()
+    $.ajax({
+		type: "POST",
+		url: "../php/getimg.php",
+		data: {
+			command: "ifhasperson"// 注意不要在此行增加逗号
+		},
+		dataType: "json",
+		success: function (msg) {
+
+            if(msg.Status=="FINDPEOPLE")
+            {
+                clearInterval(id);
+                alert("有人正在您的房门前");
+            }
+            console.log(msg);
+            
+		}
+    });
+   }
+    var id=setInterval("auto_tab_div()",2000);
+</script>
 </html>
+
+</html>
+
+

@@ -28,6 +28,10 @@ const int BUFF_LEN = 200;
 
 #define SOUND_COMMAND 15 //
 #define SOUND_CONFIRM 16
+
+#define START_LIGHTING 21
+#define STOP_LIGHTING 22
+
 struct package
 {
     char IfM;       //是客户端还是app
@@ -50,7 +54,7 @@ struct machine
 
 class NodeMcuServer
 {
-  public:
+public:
     int save_machince_info(struct machine *info, struct package pack);
     void do_package_command(struct package info);
     void react_to_package(char *buf, int count, struct package &pak);
@@ -61,16 +65,17 @@ class NodeMcuServer
     int get_machine_info(struct machine *info, struct package pack);
     int add_machine_info(struct machine *info, struct package pack);
     int get_machine_info(struct machine *info);
-    int get_machine_finger_machine(struct machine *info,struct machine *finger);
-    int get_finger_machine_finger(struct machine *finger,struct machine *info);
-    int get_sound_machine_sound(struct machine *sound,struct machine *info);
-    int get_machine_sound_machine(struct machine *info,struct machine *sound);
+    int get_machine_finger_machine(struct machine *info, struct machine *finger);
+    int get_finger_machine_finger(struct machine *finger, struct machine *info);
+    int get_sound_machine_sound(struct machine *sound, struct machine *info);
+    int get_machine_sound_machine(struct machine *info, struct machine *sound);
+    int set_machine_status(int id, const char * status);
     void print(const char *info)
     {
         printf(info);
     }
 
-  protected:
+protected:
     int sockfd;
     MYSQL *mysql;
     struct package ACK;
@@ -89,7 +94,7 @@ void NodeMcuServer::init_mysql()
     /* 连接数据库，失败返回NULL
        1、mysqld没运行
        2、没有指定名称的数据库存在 */
-    if (mysql_real_connect(mysql, "localhost", "root", "yyy19980425", "NodeMcu", 0, NULL, 0) == NULL)
+    if (mysql_real_connect(mysql, "localhost", "root", "114514", "NodeMcu", 0, NULL, 0) == NULL)
     {
         cout << "mysql_real_connect failed(" << mysql_error(mysql) << ")" << endl;
         exit(-1);
@@ -201,7 +206,7 @@ int NodeMcuServer::get_machine_info(struct machine *info)
     return 0;
 }
 
-int NodeMcuServer::get_sound_machine_sound(struct machine *sound,struct machine *info)
+int NodeMcuServer::get_sound_machine_sound(struct machine *sound, struct machine *info)
 {
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -214,7 +219,7 @@ int NodeMcuServer::get_sound_machine_sound(struct machine *sound,struct machine 
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
         return (-1);
     }
-     if ((result = mysql_store_result(mysql)) == NULL)
+    if ((result = mysql_store_result(mysql)) == NULL)
     {
         cout << "mysql_store_result failed" << endl;
         return (-1);
@@ -235,7 +240,7 @@ int NodeMcuServer::get_sound_machine_sound(struct machine *sound,struct machine 
     mysql_free_result(result);
     return 0;
 }
-int NodeMcuServer::get_finger_machine_finger(struct machine *finger,struct machine *info)
+int NodeMcuServer::get_finger_machine_finger(struct machine *finger, struct machine *info)
 {
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -248,7 +253,7 @@ int NodeMcuServer::get_finger_machine_finger(struct machine *finger,struct machi
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
         return (-1);
     }
-     if ((result = mysql_store_result(mysql)) == NULL)
+    if ((result = mysql_store_result(mysql)) == NULL)
     {
         cout << "mysql_store_result failed" << endl;
         return (-1);
@@ -269,7 +274,7 @@ int NodeMcuServer::get_finger_machine_finger(struct machine *finger,struct machi
     mysql_free_result(result);
     return 0;
 }
-int NodeMcuServer::get_machine_sound_machine(struct machine *info,struct machine *sound)
+int NodeMcuServer::get_machine_sound_machine(struct machine *info, struct machine *sound)
 {
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -282,7 +287,7 @@ int NodeMcuServer::get_machine_sound_machine(struct machine *info,struct machine
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
         return (-1);
     }
-     if ((result = mysql_store_result(mysql)) == NULL)
+    if ((result = mysql_store_result(mysql)) == NULL)
     {
         cout << "mysql_store_result failed" << endl;
         return (-1);
@@ -304,7 +309,7 @@ int NodeMcuServer::get_machine_sound_machine(struct machine *info,struct machine
     return 0;
 }
 
-int NodeMcuServer::get_machine_finger_machine(struct machine *info,struct machine *finger)
+int NodeMcuServer::get_machine_finger_machine(struct machine *info, struct machine *finger)
 {
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -317,7 +322,7 @@ int NodeMcuServer::get_machine_finger_machine(struct machine *info,struct machin
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
         return (-1);
     }
-     if ((result = mysql_store_result(mysql)) == NULL)
+    if ((result = mysql_store_result(mysql)) == NULL)
     {
         cout << "mysql_store_result failed" << endl;
         return (-1);
@@ -337,6 +342,22 @@ int NodeMcuServer::get_machine_finger_machine(struct machine *info,struct machin
     /* 释放result */
     mysql_free_result(result);
     return 0;
+}
+
+
+int NodeMcuServer::set_machine_status(int id, const char * status)
+{
+	char select_user[255];
+	sprintf(select_user, "update OnenetMachine set Status=\"%s\" where On_Machine_id=%d", status, id);
+	MYSQL_RES *result;
+	if (mysql_query(mysql, select_user))
+	{
+		cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+		return (-1);
+	}
+	/* 打印当前查询到的记录的数量 */
+	cout << "select return " << (int)mysql_num_rows(result) << " records" << endl;
+	return 0;
 }
 
 int NodeMcuServer::save_machince_info(struct machine *info, struct package pack)
@@ -461,10 +482,10 @@ void NodeMcuServer::MainTask()
                 now_machine.last_ack = (temp.Divide + 1) % 255;
                 now_machine.type = SMART_LOCK;
                 this->save_machince_info(&now_machine, temp); //保存设备最新地址
-                if(temp.Type == 14)
+                if (temp.Type == 14)
                 {
                     struct machine info;
-                    int flag = this->get_finger_machine_finger(&now_machine,&info);
+                    int flag = this->get_finger_machine_finger(&now_machine, &info);
                     struct sockaddr_in send_machine;
                     send_machine = cli;
                     send_machine.sin_addr.s_addr = info.addr_ip;
@@ -476,10 +497,10 @@ void NodeMcuServer::MainTask()
                     openthemachine[19] = OPEN_COMMAND; //
                     cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
                 }
-                 if(temp.Type == 16)
+                if (temp.Type == 16)
                 {
                     struct machine info;
-                    int flag = this->get_sound_machine_sound(&now_machine,&info);
+                    int flag = this->get_sound_machine_sound(&now_machine, &info);
                     struct sockaddr_in send_machine;
                     send_machine = cli;
                     send_machine.sin_addr.s_addr = info.addr_ip;
@@ -489,10 +510,40 @@ void NodeMcuServer::MainTask()
                     openthemachine[17] = 0;
                     openthemachine[18] = 20;
                     openthemachine[19] = OPEN_COMMAND; //
-                    cout<<"----------------------------------------"<<endl;
+                    cout << "----------------------------------------" << endl;
                     cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
-                    cout << info.id<<endl;
+                    cout << info.id << endl;
                 }
+				// 当红外线传感器检测到人的时候
+				// 这个就比较复杂
+				// 我思考一下
+				// emmmm
+				// 可以这样
+				// 首先是查数据库，查找对应的设备
+				// 然后数据库中将一个设备位置记为ON RUNNING
+				// 另外一个程序每次循环检查一次是否有ON RUNNINg的设备
+				// 有的话，发送EDP包给该设备，告诉其应该要进行通信了
+				// 设备返回一个照片，存入数据库
+				// 设备返回一个音频，存入数据库
+				// 前端界面一旦发现有设备位ON RUNING，js给出一个模态框
+				// 点击跳转到一个界面，轮询显示图片
+				// 如果音频。用户点击音频
+				// 给一个按钮
+				if (temp.Type == 17) 
+				{
+                    cout<<"#############################################"<<endl;
+					set_machine_status(527923817,"FINDPEOPLE");
+
+					char openthemachine[20] = "STHISISSERVERMEG";
+					openthemachine[16] = 0;
+					openthemachine[17] = 0;
+					openthemachine[18] = 20;
+					openthemachine[19] = STOP_LIGHTING; //
+					cout << "----------------------------------------" << endl;
+
+					cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&cli, len) << endl;
+                    cout<<"#############################################"<<endl;
+				}
                 //this->do_package_command(temp);               //应对包命令
                 this->send_ack(cli, temp); //发送ack
             }
@@ -534,7 +585,7 @@ void NodeMcuServer::MainTask()
                 struct machine info;
                 memcpy(info.id, temp.Info + 20, 15);
                 struct machine finger;
-                int flag = get_machine_finger_machine(&info,&finger);
+                int flag = get_machine_finger_machine(&info, &finger);
 
                 struct sockaddr_in send_machine;
                 send_machine = cli;
@@ -554,7 +605,7 @@ void NodeMcuServer::MainTask()
                 struct machine info;
                 memcpy(info.id, temp.Info + 20, 15);
                 struct machine sound;
-                int flag = get_machine_sound_machine(&info,&sound);
+                int flag = get_machine_sound_machine(&info, &sound);
                 struct sockaddr_in send_machine;
                 send_machine = cli;
                 send_machine.sin_addr.s_addr = sound.addr_ip;
@@ -564,10 +615,26 @@ void NodeMcuServer::MainTask()
                 openthemachine[17] = 0;
                 openthemachine[18] = 20;
                 openthemachine[19] = SOUND_COMMAND; //
-                memcpy(openthemachine+20,"bbb",3);
+                memcpy(openthemachine + 20, "bbb", 3);
                 cout << "send:" << sendto(sockfd, openthemachine, 23, 0, (struct sockaddr *)&send_machine, len) << endl;
             }
-            //app 有哪几个功能啊草
+            if (temp.Type == 21) //光验证包
+            {
+                struct machine info;
+                memcpy(info.id, temp.Info,15);
+                int flag = get_machine_info(&info);
+                struct sockaddr_in send_machine;
+                send_machine = cli;
+                send_machine.sin_addr.s_addr = info.addr_ip;
+                send_machine.sin_port = info.addr_port;
+                char openthemachine[23] = "STHISISSERVERMEG";
+                openthemachine[16] = 0;
+                openthemachine[17] = 0;
+                openthemachine[18] = 21;
+                openthemachine[19] = START_LIGHTING; //
+                cout << "send:" << sendto(sockfd, openthemachine, 20, 0, (struct sockaddr *)&send_machine, len) << endl;
+            }
+            // app 有哪几个功能啊草
             // 预约功能
             // 先预约时段
             // 每半个小时为一个分组
@@ -578,14 +645,13 @@ void NodeMcuServer::MainTask()
             //   到时间给服务器回发消息？
             // 2.或者app查询数据库发现到时间了
             //   发送给NodeMcu开门
-            //
+
             // nodemcu进入认证模式，
             // 1.指纹本地认证
             // 2.语音认证
             // 3.app远程认证
-            //
+
             // 草早知道就不写阻塞模式了
-            //
         }
     }
     close(sockfd);
